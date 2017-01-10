@@ -16,42 +16,34 @@ module.exports = function (router) {
         ]
     });
 
-    //Get all comments
+    //Get comments that belong to 1 post or 1 answer
+    //Expects post_id or answer_id
     router.get('/comment', auth, function(req, res) {
-        Comment.findAll().then(function(comments) {
-            var dict = {};
+        var postId = req.query.post_id;
+        var answerId = req.query.answer_id;
+        var commentOn;
+        var commentOnId;
+        var dict = {};
 
-            if (comments.length < 1) {
-                dict.message ='Comments not found!';
-                dict.comments_found = comments.length;
-                res.statusCode = 404;
-                res.json(dict);
-            } else {
-                dict.message ='Comments found!';
-                dict.comments_found = comments.length;
-                res.statusCode = 200;
-                dict.comments = comments;
-                res.json(dict);
-            }
-        }).catch(function(error) {
-            var dict = {};
-            res.statusCode = 500;
-
-            dict.message = 'Get comments failed';
-            dict.error = error;
+        if (!postId && answerId) {
+            commentOn = 'answer';
+            commentOnId = parseInt(answerId);
+        } else if (postId && !answerId) {
+            commentOn = 'post';
+            commentOnId = parseInt(postId);
+        } else {
+            res.statusCode = 200;
+            dict.message = 'Please pass in a post_id or answer_id';
             res.json(dict);
-        });
-    });
+            return;
+        }
 
-    //Get comments that belong to 1 post
-    router.get('/comment/:post_id', auth, function(req, res) {
         Comment.findAll({
             where: {
-                PostId: req.params.post_id
+                commentOn: commentOn,
+                commentOnId: commentOnId
             }
         }).then(function(comments) {
-            var dict = {};
-
             if (comments.length < 1) {
                 dict.message ='Cannot find comments for this post!';
                 dict.comments_found = comments.length;
@@ -65,7 +57,6 @@ module.exports = function (router) {
                 res.json(dict);
             }
         }).catch(function(error) {
-            var dict = {};
             res.statusCode = 500;
 
             dict.message = 'Get comments failed';
@@ -75,6 +66,7 @@ module.exports = function (router) {
     });
 
     //Create a comment
+    //Pass in post_id or answer_id
     router.post('/comment', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
@@ -89,8 +81,15 @@ module.exports = function (router) {
             }
         }
 
+        if (data.post_id) {
+            valid.commentOnId = data.post_id;
+            valid.commentOn = 'post';
+        } else if (data.answer_id) {
+            valid.commentOnId = data.answer_id;
+            valid.commentOn = 'answer';
+        }
+
         valid.UserId = req.userId;
-        valid.PostId = data.postId;
 
         Comment.create(valid).then(function(comment) {
             var dict = {};
