@@ -1,0 +1,33 @@
+MySQL 
+
+starting the server
+sudo /usr/local/mysql/support-files/mysql.server start
+
+accessing the server
+mysql --user=root --password=oz,q2ACw4,T-
+
+//Should be now root
+
+
+Digital Ocean Server
+
+sshing
+ssh -i ~/.ssh/id_rsa  root@104.131.98.161
+
+
+API commands
+
+starting the NodeJS Server
+node server.js
+node-debug server.js
+
+
+APP commands
+
+starting the web server
+grunt
+
+
+Upload to S3
+
+curl --upload-file 23.png "https://s3.amazonaws.com/www.linkprototype.com/charlieouyang/536f4d5b620ff00a760557ec204af05d.png?AWSAccessKeyId=AKIAJZUXHNLLC3H7H4AA&Expires=1442170909&Signature=YzjdUoPgk4wYm2sPz6KLXZz79r4%3D"

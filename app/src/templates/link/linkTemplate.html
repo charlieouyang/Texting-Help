@@ -1,0 +1,160 @@
+<div class="main link-body">	
+    {{#link_exist}}
+    <div class="container">
+        {{#data}}
+        {{^finalized}}
+        <div class="row">
+            <div class="alert alert-warning" role="alert">This link isn't finalized!</div>
+        </div>
+        {{/finalized}}
+        <div class="row">
+            {{#picture}}
+            <div class="col-lg-4 col-md-4 .col-xs-12 col-lg-height">
+                {{#column1}}
+                <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                    <a href="{{#finalized}}{{actual_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" data-toggle="lightbox" data-gallery="media" data-title="{{name}}" data-footer="{{description}}">
+                        <img src="{{#finalized}}{{preview_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" />
+                    </a>
+                </div>
+                {{/column1}}
+            </div>
+
+            <div class="col-md-4 col-lg-height">
+                {{#column2}}
+                <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                    <a href="{{#finalized}}{{actual_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" data-toggle="lightbox" data-gallery="media" data-title="{{name}}" data-footer="{{description}}">
+                        <img src="{{#finalized}}{{preview_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" />
+                    </a>
+                </div>
+                {{/column2}}
+            </div>
+
+            {{/picture}}
+
+            {{#nonPictures}}
+            <div class="col-md-4 col-lg-height">
+                {{#nonPics}}
+                    {{#location}}
+                        <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                            <div class="location-tag">
+                                <span class="glyphicon glyphicon-map-marker location-icon" aria-hidden="true"></span>
+                                <span class="text">{{description}}</span>
+                            </div>
+                        </div>
+                    {{/location}}
+                    {{#text}}
+                        <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                            <div class="text-block">
+                                <p class="text">{{{description}}}</p>
+                            </div>
+                        </div>
+                    {{/text}}
+                    {{#video}}
+                        <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                            <a href="{{#finalized}}{{actual_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" data-toggle="lightbox" data-gallery="media" data-title="{{name}}" data-footer="{{description}}">
+                                <video src="{{#finalized}}{{preview_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" type="video/mp4" controls preload="none" poster="../../imgs/black_poster.png"/>
+                            </a>
+                        </div>
+                    {{/video}}
+                    {{#voice}}
+                        <div class="mediaContainer" id="{{id}}" media-type="{{media_type}}">
+                            <a href="{{#finalized}}{{actual_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" data-toggle="lightbox" data-gallery="media" data-title="{{name}}" data-footer="{{description}}">
+                                <audio src="{{#finalized}}{{preview_presigned_url}}{{/finalized}}{{^finalized}}{{temp_link}}{{/finalized}}" type="video/mp4" controls preload="none"/>
+                            </a>
+                        </div>
+                    {{/voice}}
+                {{/nonPics}}
+            </div>
+            {{/nonPictures}}
+        </div>
+
+        {{/data}}
+
+
+
+<!-- 
+        {{#data}}
+        <div class="row linkRow">
+
+            {{#video}}
+                <div class="row-same-height row-full-height">
+                    <div class="col-md-5 col-lg-height col-full-height">
+                        <div class="mediaContainer">
+                            <video controls>
+                                <source src="{{presignedGetURL}}" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-height col-full-height">
+                        <div class="description">
+                            <h2>{{name}}</h2>
+                            <p class="lead">{{description}}</p>
+                        </div>
+                    </div>
+                </div>
+            {{/video}}
+
+            {{#picture}}
+                <div class="row-same-height row-full-height">
+                    <div class="col-md-5 col-lg-height col-full-height">
+                        <div class="mediaContainer">
+                            <img src="{{presignedGetURL}}" />
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-height col-full-height">
+                        <div class="description">
+                            <h2>{{name}}</h2>
+                            <p class="lead">{{description}}</p>
+                        </div>
+                    </div>
+                </div>
+            {{/picture}}
+
+            {{#voice}}
+                <div class="row-same-height row-full-height">
+                    <div class="col-md-5 col-lg-height col-full-height">
+                        <div class="mediaContainer">
+                            <audio controls>
+                                <source src="{{presignedGetURL}}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-height col-full-height">
+                        <div class="description">
+                            <h2>{{name}}</h2>
+                            <p class="lead">{{description}}</p>
+                        </div>
+                    </div>
+                </div>
+            {{/voice}}
+
+            {{#text}}
+                <h3>Text</h3>
+                <p>This is dummy text!</p>
+                <br><br><br><br>
+            {{/text}}
+        </div>
+        {{/data}} -->
+
+
+    </div>
+    {{/link_exist}}
+
+    {{^link_exist}}
+        <div class="row linkRow">
+            <div class="row-same-height row-full-height">
+                <div class="col-md-5 col-lg-height col-full-height">
+                    <div class="mediaContainer">
+                        <img src="http://uhoh.com/example.jpg" />
+                    </div>
+                </div>                    
+                <div class="col-md-7 col-lg-height col-full-height">
+                    <div class="description">
+                        <h2>Uh oh! Link doesn't exist!</h2>
+                        <p class="lead">This {{linkUrl}} link doesn't have any media attached to it yet. Please follow instructions on the home page to attach media to this link!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/link_exist}}
+</div>

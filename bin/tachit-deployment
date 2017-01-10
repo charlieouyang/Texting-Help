@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd /var/www/Tachit/api
+npm install
+cp /var/www/Tachit/tachit.service /lib/systemd/system/tachit.service
+systemctl daemon-reload
+systemctl restart tachit
+sleep 5
+curl -i http://localhost:6080/api

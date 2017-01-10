@@ -1,0 +1,4 @@
+*~
+/api/node_modules
+/app/.sass-cache
+/app/build

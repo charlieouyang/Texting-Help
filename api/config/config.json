@@ -1,0 +1,12 @@
+{
+    "default": {
+        "mysql": {
+            "username": "root",
+            "password": "root",
+            "database": "texting_help",
+            "dialect": "mysql",
+            "host": "localhost"
+        },
+        "hostName": "http://localhost:6080/"
+    }
+}

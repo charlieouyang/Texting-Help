@@ -1,0 +1,19 @@
+[Unit]
+Description=Tachit API Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/Tachit/api/
+ExecStart=/usr/bin/node /var/www/Tachit/api/server.js
+
+RestartSec=2
+Restart=on-failure
+
+# use syslog for logging
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=tachit
+
+[Install]
+WantedBy=multi-user.target
