@@ -17,7 +17,7 @@ module.exports = function (router) {
     });
 
     //Get all answers
-    router.get('/answer', auth, function(req, res) {
+    router.get('/answer', function(req, res) {
         Answer.findAll().then(function(answers) {
             var dict = {};
 
@@ -44,7 +44,7 @@ module.exports = function (router) {
     });
 
     //Get answers that belong to 1 post
-    router.get('/answer/:post_id', auth, function(req, res) {
+    router.get('/answer/:post_id', function(req, res) {
         Answer.findAll({
             where: {
                 PostId: req.params.post_id

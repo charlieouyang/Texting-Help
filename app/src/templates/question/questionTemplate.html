@@ -1,0 +1,58 @@
+<div class="container single-question">
+    <div class="col-md-12">
+    {{#post}}
+        <div class="question-title">
+            <h2>{{title}}</h2>
+        </div>
+        <div class="jumbotron">
+            <div class="row">
+                <p class="question-description">{{description}}</p>
+            </div>
+            <div class="row">
+                <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+            </div>
+
+            <div class="list-group comments-list-on-post">
+            {{#Comments}}
+                <div class="list-group-item flex-column align-items-start comment-row">
+                    <div class="row">
+                        <p class="comment-on-post-description">{{description}}</p>
+                    </div>
+                    <div class="row">
+                        <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                    </div>
+                </div>
+            {{/Comments}}
+            </div>
+        </div>
+        <br>
+        <div class="answers-title">
+            <h2>Answers</h2>
+        </div>
+        <div class="answers-list-on-post">
+        {{#Answers}}
+            <div class="jumbotron">
+                <div class="row">
+                    <p class="question-description">{{description}}</p>
+                </div>
+                <div class="row">
+                    <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                </div>
+                <div class="list-group comments-list-on-post">
+                {{#Comments}}
+                    <div class="list-group-item flex-column align-items-start comment-row">
+                        <div class="row">
+                            <p class="comment-on-post-description">{{description}}</p>
+                        </div>
+                        <div class="row">
+                            <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                        </div>
+                    </div>
+                {{/Comments}}
+                </div>
+            </div>
+        {{/Answers}}
+        </div>
+    {{/post}}
+    </div>
+</div>

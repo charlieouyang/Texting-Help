@@ -1,73 +1,25 @@
-/* Special class on .container surrounding .navbar, used for positioning it into place. */
-.navbar-wrapper {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 20;
+.header-section {
+  padding: 10px;
+  background-color: lightblue !important;
 
-  .icon-bar {
-    background-color: white;
-  }
-}
-/* RESPONSIVE CSS
--------------------------------------------------- */
+  .user-login-header {
+    float: right;
 
-@media (min-width: 768px) {
-  /* Navbar positioning foo */
-  .navbar-wrapper {
-    margin-top: 20px;
-  }
-  .navbar-wrapper .container {
-    padding-right: 15px;
-    padding-left: 15px;
-  }
-  .navbar-wrapper .navbar {
-    padding-right: 0;
-    padding-left: 0;
+    .header-logout {
+      float: right;
+      color: gray;
+      cursor: pointer;
+    }
+
+    .header-logout:hover {
+      color: black;
+      text-decoration: underline;
+    }
   }
 
-  /* The navbar becomes detached from the top, so we round the corners */
-  .navbar-wrapper .navbar {
-    border-radius: 4px;
-  }
-}
-
-.navbar-nav {
-  li {
-    padding-right: 25px;
-    padding-top: 5px;
-  }
-
-  .twitter {
-    width: 45px;
-    height: 45px;
-    background: url(../imgs/sprite.png);
-    background-position: 0px 0px;
-    background-size: 685% 100%;
-  }
-
-  .facebook {
-    width: 45px;
-    height: 45px;
-    background: url(../imgs/sprite.png);
-    background-position: 250px 0px;
-    background-size: 685% 100%;
-  }
-
-  .instagram {
-    width: 45px;
-    height: 45px;
-    background: url(../imgs/sprite.png);
-    background-position: 189px 0px;
-    background-size: 685% 100%;
-  }
-
-  .menu {
-    width: 111px;
-    height: 45px;
-    background: url(../imgs/sprite.png);
-    background-position: 112px 0px;
-    background-size: 275% 100%;
+  .home-button {
+    float: left;
+    margin-top: 8px;
+    padding-left: 10px;
   }
 }

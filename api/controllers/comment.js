@@ -18,7 +18,7 @@ module.exports = function (router) {
 
     //Get comments that belong to 1 post or 1 answer
     //Expects post_id or answer_id
-    router.get('/comment', auth, function(req, res) {
+    router.get('/comment', function(req, res) {
         var postId = req.query.post_id;
         var answerId = req.query.answer_id;
         var commentOn;

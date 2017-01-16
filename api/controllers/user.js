@@ -66,7 +66,7 @@ module.exports = function (router) {
         });
     });
 
-    router.get('/users/:username', auth, function(req, res, next) {
+    router.get('/users/:username', function(req, res, next) {
         User.find({
             where:{username: req.params.username}
         }).then(function(user) {
@@ -205,7 +205,7 @@ module.exports = function (router) {
         });
     });
 
-    router.get('/users', auth, function(req, res) {
+    router.get('/users', function(req, res) {
         User.findAll().then(function(users) {
             var response = [];
             users.forEach(function(user) {

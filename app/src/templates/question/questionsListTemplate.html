@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="col-md-12">
+        <div class="list-group questions-list">
+            {{#questions}}
+            <a href="#question/{{id}}" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="row">
+                    <h5 class="question-list-title col-md-10">{{title}}</h5>
+                    <div class="question-meta col-md-2">
+                        <div class="question-list-badges">
+                            <span class="badge badge-pill badge-success">{{numberOfAnswers}}</span>
+                            <span class="badge badge-pill badge-default">{{numberOfComments}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <p class="question-description">{{description}}</p>
+                </div>
+                <div class="row">
+                    <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                </div>
+            </a>
+            {{/questions}}
+        </div>
+    </div>
+</div>

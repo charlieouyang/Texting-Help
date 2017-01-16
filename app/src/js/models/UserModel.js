@@ -3,11 +3,12 @@ define([
   'backbone'
 ], function(_, Backbone) {
   
-  var EmailModel = Backbone.Model.extend({
+  var ClickModel = Backbone.Model.extend({
 
     initialize: function (options) {
       // this.appConfig = JSON.parse(appConfig);
-      // this.apiUrl = this.appConfig.api.endpoint + "/email";
+      // this.apiUrl = this.appConfig.api.endpoint + "/click";
+      this.apiUrl = 'http://localhost:6080/api/users/' + options.userId;
     },
 
     url: function() {
@@ -15,5 +16,5 @@ define([
     }
   });
 
-  return EmailModel;
+  return ClickModel;
 });
