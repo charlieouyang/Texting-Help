@@ -6,23 +6,29 @@ define([
 
   var SessionModel = Backbone.Model.extend({
 
-    url: '/users',
-
     initialize: function() {
+      var userToken = 'temproary token';
       //Ajax Request Configuration
       //To Set The CSRF Token To Request Header
-      $.ajaxSetup({
-        headers: {
-          'Authorization': 'Gotta replace this with whatever authorization header is stored in localstorage'
-        }
-      });
-
-      this.url = 'http://localhost:6080/api';
 
       //Check for sessionStorage support
       if (Storage && sessionStorage) {
         this.supportStorage = true;
+
+        if (sessionStorage.user && sessionStorage.user !== 'undefined') {
+          userObject = JSON.parse(sessionStorage.user);
+          userToken = userObject.token;
+          this.url = 'http://localhost:6080/api/users/' + userObject.username;
+        } else {
+          this.url = 'http://localhost:6080/api';
+        }
       }
+
+      $.ajaxSetup({
+        headers: {
+          'Authorization': userToken
+        }
+      });
     },
 
     get: function(key) {
@@ -73,6 +79,14 @@ define([
         type: 'POST'
       });
       login.done(function(response) {
+
+        //Set the $.ajax authorization token here
+        $.ajaxSetup({
+          headers: {
+            'Authorization': response.token
+          }
+        });
+
         that.set('authenticated', true);
         that.set('user', JSON.stringify(response));
         if (that.get('redirectFrom')) {
@@ -109,16 +123,16 @@ define([
       var that = this;
       var user = this.get('user');
 
-      // if (user) {
-      //   this.url = 'http://localhost:6080/api/users';
-      //   this.
-      // }
-
       var Session = this.fetch();
 
       Session.done(function(response) {
-        that.set('authenticated', true);
-        that.set('user', JSON.stringify(response.user));
+        if (response && response.token) {
+          that.set('authenticated', true);
+          that.set('user', JSON.stringify(response));
+        } else {
+          that.clear();
+          that.initialize();
+        }
       });
 
       Session.fail(function(response) {

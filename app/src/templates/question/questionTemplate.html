@@ -6,23 +6,37 @@
         </div>
         <div class="jumbotron">
             <div class="row">
-                <p class="question-description">{{description}}</p>
-            </div>
-            <div class="row">
-                <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                <div class="vote row col-md-1" vote-type="post" vote-type-id="{{id}}">
+                {{#vote}}
+                    <a class="vote-up {{#userVotedUpForPost}}vote-up-on{{/userVotedUpForPost}}{{^userVotedUpForPost}}vote-up-off{{/userVotedUpForPost}}"></a>
+                    <span class="upvote-count">{{net_up_votes}}</span>
+                    <a class="vote-down {{#userVotedDownForPost}}vote-down-on{{/userVotedDownForPost}}{{^userVotedDownForPost}}vote-down-off{{/userVotedDownForPost}}"></a>
+                {{/vote}}
+                </div>
+                <div class="row col-md-11">
+                    <p class="question-description">{{description}}</p>
+                    {{#User}}
+                        <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">asked {{createdTimeDifference}}</small></label>
+                    {{/User}}
+                </div>
             </div>
 
             <div class="list-group comments-list-on-post">
-            {{#Comments}}
+            {{#postComments}}
                 <div class="list-group-item flex-column align-items-start comment-row">
                     <div class="row">
                         <p class="comment-on-post-description">{{description}}</p>
                     </div>
                     <div class="row">
-                        <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                    {{#User}}
+                        <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
+                    {{/User}}
                     </div>
                 </div>
-            {{/Comments}}
+            {{/postComments}}
+            </div>
+            <div class="row add-a-comment-row" comment-type="post" comment-type-id="{{id}}">
+                <span class="add-a-comment">Add a comment</span>
             </div>
         </div>
         <br>
@@ -33,25 +47,46 @@
         {{#Answers}}
             <div class="jumbotron">
                 <div class="row">
-                    <p class="question-description">{{description}}</p>
-                </div>
-                <div class="row">
-                    <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                    <div class="vote row col-md-1" vote-type="answer" vote-type-id="{{id}}">
+                    {{#vote}}
+                        <a class="vote-up {{#userVotedUpForPost}}vote-up-on{{/userVotedUpForPost}}{{^userVotedUpForPost}}vote-up-off{{/userVotedUpForPost}}"></a>
+                        <span class="upvote-count">{{net_up_votes}}</span>
+                        <a class="vote-down {{#userVotedDownForPost}}vote-down-on{{/userVotedDownForPost}}{{^userVotedDownForPost}}vote-down-off{{/userVotedDownForPost}}"></a>
+                    {{/vote}}
+                    </div>
+                    <div class="row col-md-11">
+                        <p class="question-description">{{description}}</p>
+                        {{#User}}
+                            <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">answered {{createdTimeDifference}}</small></label>
+                        {{/User}}
+                    </div>
                 </div>
                 <div class="list-group comments-list-on-post">
-                {{#Comments}}
+                {{#answerComments}}
                     <div class="list-group-item flex-column align-items-start comment-row">
                         <div class="row">
                             <p class="comment-on-post-description">{{description}}</p>
                         </div>
                         <div class="row">
-                            <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                        {{#User}}
+                            <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
+                        {{/User}}
                         </div>
                     </div>
-                {{/Comments}}
+                {{/answerComments}}
+                </div>
+                <div class="row add-a-comment-row" comment-type="answer" comment-type-id="{{id}}">
+                    <span class="add-a-comment">Add a comment</span>
                 </div>
             </div>
         {{/Answers}}
+        </div>
+        <div class="row add-an-answer-row" post-id="{{id}}">
+            <div class="form-group">
+                <label for="comment">Your Answer</label>
+                <textarea class="form-control" rows="4"></textarea>
+                <button class="btn btn-success comment-answer-button answer-submit">Post Your Answer</button>
+            </div>
         </div>
     {{/post}}
     </div>

@@ -1,5 +1,14 @@
 <div class="container">
     <div class="col-md-12">
+        <h2>Questions</h2>
+        <div class="btn-group filtering-questions-container" data-toggle="buttons">
+            <label class="btn btn-success my-questions-only {{#asked_by}}active{{/asked_by}}">
+                <input type="checkbox">My Questions</input>
+            </label>
+            <label class="btn btn-info oldest-questions-first {{#sort_by}}active{{/sort_by}}">
+                <input type="checkbox">Oldest Question First</input>
+            </label>
+        </div>
         <div class="list-group questions-list">
             {{#questions}}
             <a href="#question/{{id}}" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -16,7 +25,9 @@
                     <p class="question-description">{{description}}</p>
                 </div>
                 <div class="row">
-                    <small class="text-muted time-difference-text">{{createdTimeDifference}}</small>
+                {{#User}}
+                    <small class="text-muted time-difference-text">{{username}} asked {{createdTimeDifference}}</small>
+                {{/User}}
                 </div>
             </a>
             {{/questions}}

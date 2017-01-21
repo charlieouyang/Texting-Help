@@ -7,30 +7,31 @@ define([
 ], function($, _, Backbone, Mustache, loginTemplate){
 
   var LoginView = Backbone.View.extend({
-    el: $("#content"),
-
-    events: {
-      'click .login-button-submit': 'loginBUttonClick'
-    },
 
     initialize: function(opts) {
       this.sessionModel = opts.session;
     },
 
-    render: function(){
+    render: function(opts){
       var self = this;
       var rendered;
       var result = {};
 
       result.authenticated = this.sessionModel.get('authenticated');
       rendered = Mustache.to_html(loginTemplate, result);
-      this.$el.html(rendered);
+      this.el = rendered;
+
+      opts.finished();
+
+      $(".login-button-submit").on('click', function(e){
+        self.loginBUttonClick(e);
+      });
     },
 
     loginBUttonClick: function (e) {
       var self = this;
-      var username = self.$el.find('.login-username').val();
-      var password = self.$el.find('.login-password').val();
+      var username = $('.login-username').val();
+      var password = $('.login-password').val();
 
       e.preventDefault();
 

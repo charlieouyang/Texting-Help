@@ -9,7 +9,6 @@ define([
 ], function($, _, Backbone, Mustache, EmailModel, ClickModel, homeTemplate){
 
   var HomeView = Backbone.View.extend({
-    el: $("#content"),
 
     events: {
 
@@ -19,14 +18,16 @@ define([
       this.sessionModel = opts.session;
     },
 
-    render: function(){
+    render: function(opts){
       var self = this;
       var rendered;
       var result = {};
 
       result.authenticated = this.sessionModel.get('authenticated');
       rendered = Mustache.to_html(homeTemplate, result);
-      this.$el.html(rendered);
+      this.el = rendered;
+
+      opts.finished();
     }
 
   });

@@ -6,7 +6,11 @@ define([
   var QuestionModel = Backbone.Model.extend({
 
     initialize : function(options) {
-      this.apiUrl = 'http://localhost:6080/api/post/' + options.id;
+      if (options.id) {
+        this.apiUrl = 'http://localhost:6080/api/post/' + options.id;
+      } else {
+        this.apiUrl = 'http://localhost:6080/api/post';
+      }
     },
       
     url : function() {

@@ -7,6 +7,7 @@ module.exports = function (router) {
         Post = db.Post,
         Answer = db.Answer,
         Comment = db.Comment,
+        User = db.User,
         availableFields = {
             'title': 'title',
             'description': 'description',
@@ -32,20 +33,64 @@ module.exports = function (router) {
     }
 
     //Get all posts
-    //Gotta 
+    //Gotta
+    /*
+    Filtering and sorting parameters
+        - Sort by date... Earliest or Latest?
+        - Filter by my answers only
+    */
     router.get('/post', function(req, res) {
-        Post.findAndCountAll({
-            include: [{
-                model: Answer,
-                as: 'Answers'
-            }],
-            offset: 0,
-            limit: 10
-        }).then(function(posts) {
-            var postRows = posts.rows;
+        var queryParams = req.query;
+        var postFindingOptions = {};
+        var sortByDateLatest = true;
+        var sortByValue;
+
+        postFindingOptions.offset = 0;
+        postFindingOptions.limit = 10;
+        postFindingOptions.include = [];
+        postFindingOptions.include.push({
+            model: Answer,
+            as: 'Answers'
+        });
+        postFindingOptions.include.push({
+            model: User,
+            as: 'User',
+            attributes: ['username', 'id']
+        });
+
+        if (queryParams.asked_by) {
+            postFindingOptions.where = {};
+            postFindingOptions.where.UserId = queryParams.asked_by;
+        }
+
+        if (queryParams.sort_by) {
+            sortByValue = queryParams.sort_by
+
+            if (sortByValue.substring(1, sortByValue.length) === 'date') {
+                sortByDateLatest = sortByValue[0] === '-' ? false : true;
+            }
+        }
+
+        Post.findAndCountAll(postFindingOptions).then(function(posts) {
+            var postRows;
             var dict = {};
             var postIds = [];
 
+            if (sortByDateLatest) {
+                posts.rows.sort(function(a,b){
+                    // Turn your strings into dates, and then subtract them
+                    // to get a value that is either negative, positive, or zero.
+                    return new Date(b.dataValues.createdAt) - new Date(a.dataValues.createdAt);
+                });
+            } else {
+                posts.rows.sort(function(a,b){
+                    // Turn your strings into dates, and then subtract them
+                    // to get a value that is either negative, positive, or zero.
+                    return new Date(a.dataValues.createdAt) - new Date(b.dataValues.createdAt);
+                });
+            }
+
+            postRows = posts.rows;
             postRows.forEach(function(postObjects){
                 postIds.push(postObjects.id);
             });
@@ -56,7 +101,12 @@ module.exports = function (router) {
                     commentOnId: {
                         $or: postIds
                     }
-                }
+                },
+                include: [{
+                    model: User,
+                    as: 'User',
+                    attributes: ['username', 'id']
+                }]
             }).then(function(commentsReturned){
                 var commentOnIdToPostDict = {};
                 commentsReturned.forEach(function(commentObject){
@@ -99,7 +149,16 @@ module.exports = function (router) {
         Post.findAll({
             include: [{
                 model: Answer,
-                as: 'Answers'
+                as: 'Answers',
+                include: [{
+                    model: User,
+                    as: 'User',
+                    attributes: ['username', 'id']
+                }]
+            },{
+                model: User,
+                as: 'User',
+                attributes: ['username', 'id']
             }],
             where: {
                 id: req.params.post_id
@@ -124,7 +183,12 @@ module.exports = function (router) {
                     where: {
                         commentOn: 'post',
                         commentOnId: post.id
-                    }
+                    },
+                    include: [{
+                        model: User,
+                        as: 'User',
+                        attributes: ['username', 'id']
+                    }]
                 }).then(function(commentsForQuestion){
                     dict.post.dataValues.Comments = commentsForQuestion;
 
@@ -140,7 +204,12 @@ module.exports = function (router) {
                                 commentOnId: {
                                     $or: answerIds
                                 }
-                            }
+                            },
+                            include: [{
+                                model: User,
+                                as: 'User',
+                                attributes: ['username', 'id']
+                            }]
                         }).then(function(commentsForAnswers){
                             var commentOnIdToAnswerDict = {};
                             

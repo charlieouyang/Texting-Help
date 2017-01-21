@@ -9,7 +9,8 @@ require.config({
     underscore: 'libs/underscore/underscore-min',
     backbone: 'libs/backbone/backbone-min',
     templates: '../templates',
-    Mustache: 'libs/mustache/mustache.min'
+    Mustache: 'libs/mustache/mustache.min',
+    Utils: 'libs/native/Utils'
   }
 
 });

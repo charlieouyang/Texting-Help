@@ -1,3 +1,66 @@
+.filtering-questions-container {
+  padding: 20px 0px;
+}
+
+.vote {
+  padding: 0px;
+
+  .vote-up-off {
+    display: block;
+    cursor: pointer;
+    height: 30px;
+    width: 40px;
+    background-image: url("../imgs/sprites.svg"), none;
+    background-repeat: no-repeat;
+    background-position: 0 -170px;
+    overflow: hidden;
+    font-size: 1px;
+  }
+
+  .vote-up-on {
+    display: block;
+    cursor: pointer;
+    height: 30px;
+    width: 40px;
+    background-image: url("../imgs/sprites.svg"), none;
+    background-repeat: no-repeat;
+    background-position: -40px -170px;
+    overflow: hidden;
+    font-size: 1px;
+  }
+
+  .upvote-count {
+    display: block;
+    font-size: 20px;
+    text-align: center;
+    width: 38px;
+  }
+
+  .vote-down-off {
+    display: block;
+    cursor: pointer;
+    height: 30px;
+    width: 40px;
+    background-image: url("../imgs/sprites.svg"), none;
+    background-repeat: no-repeat;
+    background-position: 0 -220px;
+    overflow: hidden;
+    font-size: 1px;
+  }
+
+  .vote-down-on {
+    display: block;
+    cursor: pointer;
+    height: 30px;
+    width: 40px;
+    background-image: url("../imgs/sprites.svg"), none;
+    background-repeat: no-repeat;
+    background-position: -40px -220px;
+    overflow: hidden;
+    font-size: 1px;
+  }
+}
+
 .questions-list {
   .time-difference-text {
     padding: 18px;
@@ -34,6 +97,15 @@
 
 }
 
+.add-a-comment-row {
+  padding: 20px 20px 0px 20px;
+
+  .add-a-comment {
+    cursor: pointer;
+    color: #337ab7;
+  }
+}
+
 .single-question {
   .comment-row {
     padding-left: 30px;
@@ -44,7 +116,7 @@
   }
 
   .comments-list-on-post {
-    margin: 30px 0px 0px 0px;
+    margin: 10px 0px 0px 0px;
   }
 
   .comment-on-post-description {
@@ -56,4 +128,8 @@
 .jumbotron {
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.question-create-edit-form{
+  margin-bottom: 20px;
 }
