@@ -91,8 +91,6 @@ module.exports = function (router) {
     router.put('/users/:username', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
-                'username': 'username',
-                'password': 'password',
                 'name': 'name',
                 'email': 'email'
             },

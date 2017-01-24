@@ -4,13 +4,16 @@ module.exports = function(sequelize, DataTypes) {
     var Vote = sequelize.define('Vote',
         {
             voteValue: {
-                type: DataTypes.ENUM('1', '-1')
+                type: DataTypes.ENUM('1', '-1'),
+                allowNull: false
             },
             voteOn: {
-                type: DataTypes.ENUM('post', 'answer')
+                type: DataTypes.ENUM('post', 'answer'),
+                allowNull: false
             },
             voteOnId: {
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
+                allowNull: false
             },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         },

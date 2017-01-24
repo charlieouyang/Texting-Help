@@ -4,10 +4,12 @@ module.exports = function(sequelize, DataTypes) {
     var Post = sequelize.define('Post',
         {
             title: {
-                type: DataTypes.TEXT
+                type: DataTypes.TEXT,
+                allowNull: false
             },
             description: {
-                type: DataTypes.TEXT
+                type: DataTypes.TEXT,
+                allowNull: false
             },
             tags: {
                 type: DataTypes.TEXT

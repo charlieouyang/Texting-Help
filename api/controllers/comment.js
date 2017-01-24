@@ -4,6 +4,7 @@ module.exports = function (router) {
     var db = require('../models'),
         auth = require('../middleware/authentication'),
         Comment = db.Comment,
+        Point = db.Point,
         availableFields = {
             'description': 'description'
         },
@@ -70,7 +71,8 @@ module.exports = function (router) {
     router.post('/comment', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
-                'description': 'description'
+                'description': 'description',
+                'post_or_answer_owner_user': 'post_or_answer_owner_user'
             },
             valid = {};
 
@@ -93,18 +95,43 @@ module.exports = function (router) {
 
         Comment.create(valid).then(function(comment) {
             var dict = {};
+            var pointDictForOriginalPost = {};
+            var pointDictForAnswer = {};
             for (var key in availableFields) {
                 if (availableFields.hasOwnProperty(key)) {
                     dict[availableFields[key]] = comment[key];
                 }
             }
-            res.json(dict);
+
+            pointDictForOriginalPost.pointOn = valid.commentOn;
+            pointDictForOriginalPost.pointOnId = valid.commentOnId;
+            pointDictForOriginalPost.pointValue = 10;
+            pointDictForOriginalPost.UserId = valid.post_or_answer_owner_user;
+            pointDictForOriginalPost.fromUserId = valid.UserId;
+
+            Point.create(pointDictForOriginalPost).then(function(originalPostPoint){
+                pointDictForAnswer.pointOn = 'comment';
+                pointDictForAnswer.pointOnId = comment.id;
+                pointDictForAnswer.pointValue = 10;
+                pointDictForAnswer.UserId = valid.UserId;
+                pointDictForAnswer.fromUserId = valid.UserId;
+
+                Point.create(pointDictForAnswer).then(function(answerPoint){
+                    dict.message = 'Comment created, point created for original post, and point created for comment!'
+                    res.json(dict);
+                }).catch(function(error){
+                    dict.message = 'Comment created and point created for original post owner user but creating point for commenter failed!'
+                    res.json(dict);
+                });
+            }).catch(function(error){
+                dict.message = 'Comment created but there was a problem creating a point for original post owner user!'
+                res.json(dict);
+            });
         }).catch(function(error) {
             res.statusCode = 422;
-            var dict = {message: 'Validation Failed', errors: []},
-                errors = error.errors[0];
+            var dict = {message: 'Validation Failed'};
 
-            dict.errors.push(errors);
+            dict.error = error;
             res.json(dict);
         });
     });

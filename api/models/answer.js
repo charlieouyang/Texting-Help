@@ -4,7 +4,8 @@ module.exports = function(sequelize, DataTypes) {
     var Answer = sequelize.define('Answer',
         {
             description: {
-                type: DataTypes.TEXT
+                type: DataTypes.TEXT,
+                allowNull: false
             },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         },

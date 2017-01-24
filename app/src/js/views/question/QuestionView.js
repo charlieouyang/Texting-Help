@@ -78,6 +78,7 @@ define([
       var voteType = voteContainer.attr('vote-type');
       var voteTypeId = voteContainer.attr('vote-type-id');
       var upVoteCountSpan = voteContainer.find('.upvote-count');
+      var postOrAnswerOwnerId = voteContainer.attr("post-answer-owner-user-id");
       var upVoteCountValue = parseInt(upVoteCountSpan.text());
       var voteSaveObject = {};
 
@@ -86,6 +87,7 @@ define([
       } else {
         voteSaveObject.answer_id = voteTypeId;
       }
+      voteSaveObject.post_or_answer_owner_user = postOrAnswerOwnerId;
 
       if (element.hasClass('vote-up-off')) {
         //Replace with class vote-up-on
@@ -158,6 +160,7 @@ define([
         var commentText = $(e.currentTarget).siblings('textarea')[0].value;
         var commentType = commentContainer.getAttribute('comment-type');
         var commentTypeId = commentContainer.getAttribute('comment-type-id');
+        var originalPostOrAnswerUserId = commentContainer.getAttribute("post_or_answer_owner_user_id");
         var commentModel = new Comment();
         var commentOptions = {};
 
@@ -167,6 +170,7 @@ define([
           commentOptions.answer_id = commentTypeId;
         }
         commentOptions.description = commentText;
+        commentOptions.post_or_answer_owner_user = originalPostOrAnswerUserId;
 
         commentModel.save(commentOptions, {
           success: function() {
@@ -187,6 +191,7 @@ define([
     addAnswerClick: function(e) {
       var self = this;
       var answerContainer = $(e.currentTarget).closest('.add-an-answer-row')[0];
+      var postOwnerUserId = answerContainer.getAttribute("post_owner_user_id");
       var answerText = $(e.currentTarget).siblings('textarea')[0].value;
       var postId = answerContainer.getAttribute('post-id');
       var answerModel = new Answer();
@@ -194,6 +199,7 @@ define([
 
       answerOptions.post_id = postId;
       answerOptions.description = answerText;
+      answerOptions.post_or_answer_owner_user = postOwnerUserId;
 
       answerModel.save(answerOptions, {
         success: function() {

@@ -4,13 +4,16 @@ module.exports = function(sequelize, DataTypes) {
     var Comment = sequelize.define('Comment',
         {
             description: {
-                type: DataTypes.TEXT
+                type: DataTypes.TEXT,
+                allowNull: false
             },
             commentOn: {
-                type: DataTypes.ENUM('post', 'answer')
+                type: DataTypes.ENUM('post', 'answer'),
+                allowNull: false
             },
             commentOnId: {
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
+                allowNull: false
             },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         },

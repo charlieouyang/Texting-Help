@@ -30,6 +30,8 @@ define([
       "admin/:user_id/": "adminPage",
 
       //Users pages
+      "user/create": "userPage",
+      "user/create/": "userPage",
       "user/:user_id": "userPage",
       "user/:user_id/": "userPage",
 

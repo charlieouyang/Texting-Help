@@ -4,6 +4,7 @@ module.exports = function (router) {
     var db = require('../models'),
         auth = require('../middleware/authentication'),
         Vote = db.Vote,
+        Point = db.Point,
         availableFields = {
             'voteValue': 'voteValue'
         },
@@ -86,7 +87,8 @@ module.exports = function (router) {
     router.post('/vote', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
-                'voteValue': 'voteValue'
+                'voteValue': 'voteValue',
+                'post_or_answer_owner_user': 'post_or_answer_owner_user'
             },
             valid = {};
 
@@ -125,7 +127,25 @@ module.exports = function (router) {
                             dict[availableFields[key]] = vote[key];
                         }
                     }
-                    res.json(dict);
+
+                    if (valid.voteValue === '1') {
+                        var pointData = {};
+
+                        pointData.UserId = valid.post_or_answer_owner_user;
+                        pointData.fromUserId = valid.UserId;
+                        pointData.pointValue = 20;
+                        pointData.pointOn = valid.voteOn;
+                        pointData.pointOnId = valid.voteOnId;
+                        
+                        Point.create(pointData).then(function(point){
+                            dict.message = 'Vote created and point assigned';
+                            res.json(dict);
+                        });
+                    } else {
+                        dict.message = 'Vote created and but point is not assigned';
+                        res.json(dict);
+                    }
+
                 }).catch(function(error) {
                     res.statusCode = 422;
                     var dict = {message: 'Validation Failed', errors: []},
@@ -136,6 +156,7 @@ module.exports = function (router) {
                 });
             } else {
                 var vote = votes[0];
+                var previousVoteValue = vote.voteValue;
 
                 vote.update({
                     voteValue: valid.voteValue
@@ -146,7 +167,52 @@ module.exports = function (router) {
                             dict[availableFields[key]] = vote[key];
                         }
                     }
-                    res.json(dict);
+
+                    //If previous vote is -1... Then we are updating to 1
+                        //That means we gotta create Point
+                    //Else previous vote is 1... Then we are updating to -1
+                        //That means we gotta remove Point
+                    if (previousVoteValue === '-1' && valid.voteValue === '1') {
+                        var pointData = {};
+
+                        pointData.UserId = valid.post_or_answer_owner_user;
+                        pointData.fromUserId = valid.UserId;
+                        pointData.pointValue = 20;
+                        pointData.pointOn = valid.voteOn;
+                        pointData.pointOnId = valid.voteOnId;
+                            
+                        Point.create(pointData).then(function(point){
+                            dict.message = 'Vote updated and point assigned';
+                            res.json(dict);
+                        });
+                    } else if (previousVoteValue === '1' && valid.voteValue === '-1') {
+                        Point.findAll({
+                            where: {
+                                pointOn: valid.voteOn,
+                                pointOnId: valid.voteOnId,
+                                UserId: valid.post_or_answer_owner_user,
+                                fromUserId: valid.UserId
+                            }
+                        }).then(function(points) {
+                            var point = points[0];
+
+                            point.destroy({ force: true });
+                            res.statusCode = 200;
+                            var dict = {message: 'Vote updated and point deleted'};
+                            res.json(dict);
+                        }).catch(function(error) {
+                            res.statusCode = 422;
+                            var dict = {message: 'Finding the point failed... ', errors: []},
+                                errors = error.errors[0];
+
+                            dict.errors.push(errors);
+                            res.json(dict);
+                        });
+                    } else {
+                        //Don't do anything with points because vote is not updating
+                        dict.message = "Vote updated but no point assigned because voteValue didn't change";
+                        res.json(dict);
+                    }
                 }).catch(function(error) {
                     res.statusCode = 422;
                     var dict = {message: 'Validation Failed', errors: []},
@@ -158,7 +224,7 @@ module.exports = function (router) {
             }
         }).catch(function(error) {
             res.statusCode = 500;
-
+            var dict = {};
             dict.message = 'Posting vote failed';
             dict.error = error;
             res.json(dict);
@@ -193,9 +259,29 @@ module.exports = function (router) {
                 var vote = votes[0];
 
                 vote.destroy({ force: true });
-                res.statusCode = 200;
-                var dict = {message: 'Vote has been deleted'};
-                res.json(dict);
+
+                Point.findAll({
+                    where: {
+                        pointOn: valid.voteOn,
+                        pointOnId: valid.voteOnId,
+                        UserId: valid.post_or_answer_owner_user,
+                        fromUserId: valid.UserId
+                    }
+                }).then(function(points) {
+                    var point = points[0];
+
+                    point.destroy({ force: true });
+                    res.statusCode = 200;
+                    var dict = {message: 'Vote deleted and point deleted'};
+                    res.json(dict);
+                }).catch(function(error) {
+                    res.statusCode = 422;
+                    var dict = {message: 'Finding the point failed... ', errors: []},
+                        errors = error.errors[0];
+
+                    dict.errors.push(errors);
+                    res.json(dict);
+                });
             }
         }).catch(function(error) {
             res.statusCode = 500;

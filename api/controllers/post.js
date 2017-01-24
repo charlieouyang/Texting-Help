@@ -8,6 +8,7 @@ module.exports = function (router) {
         Answer = db.Answer,
         Comment = db.Comment,
         User = db.User,
+        Point = db.Point,
         availableFields = {
             'title': 'title',
             'description': 'description',
@@ -46,7 +47,7 @@ module.exports = function (router) {
         var sortByValue;
 
         postFindingOptions.offset = 0;
-        postFindingOptions.limit = 10;
+        postFindingOptions.limit = 20;
         postFindingOptions.include = [];
         postFindingOptions.include.push({
             model: Answer,
@@ -269,12 +270,26 @@ module.exports = function (router) {
 
         Post.create(valid).then(function(post) {
             var dict = {};
+            var pointDict = {};
             for (var key in availableFields) {
                 if (availableFields.hasOwnProperty(key)) {
                     dict[availableFields[key]] = post[key];
                 }
             }
-            res.json(dict);
+
+            pointDict.pointOn = 'post';
+            pointDict.pointOnId = post.id;
+            pointDict.pointValue = 10;
+            pointDict.UserId = valid.UserId;
+            pointDict.fromUserId = valid.UserId;
+
+            Point.create(pointDict).then(function(point){
+                dict.message = 'Post created and point created for user!';
+                res.json(dict);
+            }).catch(function(error){
+                dict.message = 'Post created but there was a problem creating a point for user!'
+                res.json(dict);
+            });
         }).catch(function(error) {
             res.statusCode = 422;
             var dict = {message: 'Validation Failed', errors: []},

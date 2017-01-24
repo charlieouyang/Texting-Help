@@ -4,6 +4,7 @@ module.exports = function (router) {
     var db = require('../models'),
         auth = require('../middleware/authentication'),
         Answer = db.Answer,
+        Point = db.Point,
         availableFields = {
             'description': 'description'
         },
@@ -78,7 +79,8 @@ module.exports = function (router) {
     router.post('/answer', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
-                'description': 'description'
+                'description': 'description',
+                'post_or_answer_owner_user': 'post_or_answer_owner_user'
             },
             valid = {};
 
@@ -94,18 +96,43 @@ module.exports = function (router) {
 
         Answer.create(valid).then(function(answer) {
             var dict = {};
+            var pointDictForOriginalPost = {};
+            var pointDictForAnswer = {};
             for (var key in availableFields) {
                 if (availableFields.hasOwnProperty(key)) {
                     dict[availableFields[key]] = answer[key];
                 }
             }
-            res.json(dict);
+
+            pointDictForOriginalPost.pointOn = 'post';
+            pointDictForOriginalPost.pointOnId = data.post_id;
+            pointDictForOriginalPost.pointValue = 10;
+            pointDictForOriginalPost.UserId = valid.post_or_answer_owner_user;
+            pointDictForOriginalPost.fromUserId = valid.UserId;
+
+            Point.create(pointDictForOriginalPost).then(function(originalPostPoint){
+                pointDictForAnswer.pointOn = 'answer';
+                pointDictForAnswer.pointOnId = answer.id;
+                pointDictForAnswer.pointValue = 10;
+                pointDictForAnswer.UserId = valid.UserId;
+                pointDictForAnswer.fromUserId = valid.UserId;
+
+                Point.create(pointDictForAnswer).then(function(answerPoint){
+                    dict.message = 'Answer created, point created for original post, and point created for answer!'
+                    res.json(dict);
+                }).catch(function(error){
+                    dict.message = 'Answer created and point created for original post owner user but creating point for answerer failed!'
+                    res.json(dict);
+                });
+            }).catch(function(error){
+                dict.message = 'Answer created but there was a problem creating a point for original post owner user!'
+                res.json(dict);
+            });
         }).catch(function(error) {
             res.statusCode = 422;
-            var dict = {message: 'Validation Failed', errors: []},
-                errors = error.errors[0];
+            var dict = {message: 'Validation Failed'};
 
-            dict.errors.push(errors);
+            dict.error = error;
             res.json(dict);
         });
     });

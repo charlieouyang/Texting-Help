@@ -48,7 +48,8 @@ module.exports = function(sequelize, DataTypes) {
                 }
             },
             name: {
-                type: DataTypes.TEXT
+                type: DataTypes.TEXT,
+                allowNull: false
             },
             password: {
                 type: DataTypes.TEXT,

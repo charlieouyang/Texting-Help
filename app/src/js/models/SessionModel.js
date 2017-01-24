@@ -122,8 +122,13 @@ define([
     getAuth: function(callback) {
       var that = this;
       var user = this.get('user');
-
       var Session = this.fetch();
+
+      // if (FB) {
+      //   FB.getLoginStatus(function(response) {
+      //     console.log(response);
+      //   });
+      // }
 
       Session.done(function(response) {
         if (response && response.token) {
