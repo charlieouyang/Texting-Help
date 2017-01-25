@@ -18,6 +18,11 @@
               <label>E-Mail</label>
               <input class="form-control email" placeholder="Enter your e-mail" value="{{email}}">
             </div>
+            <div class="form-group">
+              <label>Point Total</label>
+              <br>
+              <label>{{point_total}}</label>
+            </div>
             <button type="submit" class="btn btn-primary update-user">Update User</button>
           </form>
           {{/editable}}
@@ -29,6 +34,7 @@
           <label>E-mail: &nbsp;</label><span>{{email}}</span>
           <br>
           <label>User Name: &nbsp;</label><span>{{username}}</span>
+          <label>Point Total: &nbsp;</label><span>{{point_total}}</span>
           {{/editable}}
         {{/user}}
         {{^user}}

@@ -9,6 +9,7 @@ module.exports = function (router) {
         Comment = db.Comment,
         User = db.User,
         Point = db.Point,
+        Vote = db.Vote,
         availableFields = {
             'title': 'title',
             'description': 'description',
@@ -45,9 +46,18 @@ module.exports = function (router) {
         var postFindingOptions = {};
         var sortByDateLatest = true;
         var sortByValue;
+        var onlyPostMeta = false;
+        var resultsPerPage = 10;
+        var pageNumber = queryParams.page;
 
-        postFindingOptions.offset = 0;
-        postFindingOptions.limit = 20;
+        //If we don't pass in page number, only return number of posts
+        if (!pageNumber) {
+            onlyPostMeta = true;
+        }
+
+        postFindingOptions.offset = (pageNumber - 1) * resultsPerPage;
+        postFindingOptions.limit = resultsPerPage;
+        postFindingOptions.order = [['updatedAt', 'DESC']];
         postFindingOptions.include = [];
         postFindingOptions.include.push({
             model: Answer,
@@ -77,18 +87,12 @@ module.exports = function (router) {
             var dict = {};
             var postIds = [];
 
-            if (sortByDateLatest) {
-                posts.rows.sort(function(a,b){
-                    // Turn your strings into dates, and then subtract them
-                    // to get a value that is either negative, positive, or zero.
-                    return new Date(b.dataValues.createdAt) - new Date(a.dataValues.createdAt);
-                });
-            } else {
-                posts.rows.sort(function(a,b){
-                    // Turn your strings into dates, and then subtract them
-                    // to get a value that is either negative, positive, or zero.
-                    return new Date(a.dataValues.createdAt) - new Date(b.dataValues.createdAt);
-                });
+            if (onlyPostMeta) {
+                dict.message ='Posts found!';
+                dict.posts_found = posts.count;
+                res.statusCode = 200;
+                res.json(dict);
+                return;
             }
 
             postRows = posts.rows;
@@ -119,21 +123,76 @@ module.exports = function (router) {
                     }
                 });
 
-                if (postRows.length < 1) {
-                    dict.message ='Posts not found!';
-                    dict.posts_found = postRows.length;
-                    res.statusCode = 404;
-                    res.json(dict);
-                } else {
-                    postRows.forEach(function(postObject){
-                        postObject.dataValues.Comments = commentOnIdToPostDict[postObject.id];
+                Vote.findAll({
+                    where: {
+                        voteOn: 'post',
+                        voteOnId: {
+                            $or: postIds
+                        }
+                    }
+                }).then(function(votesReturned){
+                    var voteOnIdToPostDict = {};
+                    var upvoteTotal;
+                    votesReturned.forEach(function(voteObject){
+                        if (voteOnIdToPostDict[voteObject.dataValues.voteOnId]) {
+                            voteOnIdToPostDict[voteObject.dataValues.voteOnId].push(voteObject);
+                        } else {
+                            voteOnIdToPostDict[voteObject.dataValues.voteOnId] = [];
+                            voteOnIdToPostDict[voteObject.dataValues.voteOnId].push(voteObject);
+                        }
                     });
-                    dict.message ='Posts found!';
-                    dict.posts_found = postRows.length;
-                    res.statusCode = 200;
-                    dict.postRows = postRows;
+
+                    //Combine all the upvotes here
+                    for (var key in voteOnIdToPostDict) {
+                        if (voteOnIdToPostDict.hasOwnProperty(key)) {
+                            upvoteTotal = 0;
+
+                            voteOnIdToPostDict[key].forEach(function(voteObject){
+                                if (voteObject.dataValues.voteValue === '1') {
+                                    upvoteTotal++;
+                                } else {
+                                    upvoteTotal--;
+                                }
+                            });
+
+                            voteOnIdToPostDict[key] = upvoteTotal;
+                        }
+                    }
+
+                    if (postRows.length < 1) {
+                        dict.message ='Posts not found!';
+                        dict.posts_found = postRows.length;
+                        dict.total_number_of_posts = posts.count;
+                        res.statusCode = 200;
+                        res.json(dict);
+                    } else {
+                        postRows.forEach(function(postObject){
+                            postObject.dataValues.Comments = commentOnIdToPostDict[postObject.id];
+                            postObject.dataValues.upVoteTotal = voteOnIdToPostDict[postObject.id];
+                        });
+                        dict.message ='Posts found!';
+                        dict.posts_found = postRows.length;
+                        dict.total_number_of_posts = posts.count;
+                        res.statusCode = 200;
+                        dict.postRows = postRows;
+                        res.json(dict);
+                    }
+
+                }).catch(function(error) {
+                    var dict = {};
+                    res.statusCode = 500;
+
+                    dict.message = 'Get posts succeeded, get comments succeeded, but get votes failed!';
+                    dict.error = error;
                     res.json(dict);
-                }
+                });
+            }).catch(function(error) {
+                var dict = {};
+                res.statusCode = 500;
+
+                dict.message = 'Get posts succeeded, but get comments failed!';
+                dict.error = error;
+                res.json(dict);
             });
         }).catch(function(error) {
             var dict = {};
@@ -167,7 +226,7 @@ module.exports = function (router) {
         }).then(function(posts) {
             //Get all the comments for the question,
             //Get all the comments for each answer,
-            //Comebine results and send
+            //Combine results and send
             var post;
             var dict = {};
             var answerIds;

@@ -1,5 +1,5 @@
 .filtering-questions-container {
-  padding: 20px 0px;
+  padding: 20px;
 }
 
 .vote {
@@ -78,13 +78,24 @@
   }
 
   .badge-success {
-    background-color: green;
-    margin-right: 5px;
+    background-color: #14892c;;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  .badge-primary {
+    background-color: #229ecc;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  .badge-default {
+    background-color: #b2880c;
+    font-size: 14px;
   }
 
   .question-list-badges {
     float: right;
-    margin-right: 10px;
   }
 
   .question-meta {

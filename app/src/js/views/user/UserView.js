@@ -4,8 +4,9 @@ define([
   'backbone',
   'Mustache',
   'models/UserModel',
+  'models/PointModel',
   'text!templates/user/userTemplate.html'
-], function($, _, Backbone, Mustache, UserModel, userTemplate){
+], function($, _, Backbone, Mustache, UserModel, Point, userTemplate){
 
   var LoginView = Backbone.View.extend({
 
@@ -31,25 +32,35 @@ define([
           success: function(){
             //If the user model that was fetched is same username as sessionModel... Then load
             //createdit version of user template and populate fields..
+            self.pointModel = new Point({userId: self.userModel.id});
+            self.pointModel.fetch({
+              success: function(){
+                result.user = self.userModel.toJSON();
+                result.user.point_total = self.pointModel.get('point_total');
+                sessionUser = sessionModel.get('user');
+                if (sessionUser && sessionUser.username && sessionUser.username === self.userModel.get('username')) {
+                  result.user.editable = true;
+                  rendered = Mustache.to_html(userTemplate, result);
+                  self.el = rendered;
+                } else {
+                  result.user.editable = false;
+                  rendered = Mustache.to_html(userTemplate, result);
+                  self.el = rendered;
+                }
 
-            result.user = self.userModel.toJSON();
-            sessionUser = sessionModel.get('user');
-            if (sessionUser && sessionUser.username && sessionUser.username === self.userModel.get('username')) {
-              result.user.editable = true;
-              rendered = Mustache.to_html(userTemplate, result);
-              self.el = rendered;
-            } else {
-              result.user.editable = false;
-              rendered = Mustache.to_html(userTemplate, result);
-              self.el = rendered;
-            }
-
-            opts.finished();
-            $(".post-user").on('click', function(e){
-              self.postUserClick(e);
-            });
-            $(".update-user").on('click', function(e){
-              self.updateUserClick(e);
+                opts.finished();
+                $(".post-user").on('click', function(e){
+                  self.postUserClick(e);
+                });
+                $(".update-user").on('click', function(e){
+                  self.updateUserClick(e);
+                });
+              }, 
+              error: function() {
+                //Re-route?
+                opts.finished();
+                console.log("failed");
+              }
             });
           },
           error: function(){

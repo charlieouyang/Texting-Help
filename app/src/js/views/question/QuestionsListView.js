@@ -4,9 +4,10 @@ define([
   'backbone',
   'Mustache',
   'Utils',
+  'models/QuestionModel',
   'collections/QuestionsCollection',
   'text!templates/question/questionsListTemplate.html'
-], function($, _, Backbone, Mustache, Utils, Questions, questionListTemplate){
+], function($, _, Backbone, Mustache, Utils, Question, Questions, questionListTemplate){
 
   var QuestionsView = Backbone.View.extend({
 
@@ -14,6 +15,12 @@ define([
       this.questions = new Questions();
       this.questionsQuery = opts.query;
       this.sessionModel = opts.session;
+
+      if (this.questionsQuery && this.questionsQuery.page) {
+        this.currentPage = Number(this.questionsQuery.page);
+      } else {
+        this.currentPage = 1;
+      }
     },
 
     questionsFilteringAndSortingClicked: function (e) {
@@ -21,8 +28,7 @@ define([
       //Meaning if user wants it selected, the previous state is unslected
       var self = this;
       var allSelections = [
-        'my-questions-only',
-        'oldest-questions-first'
+        'my-questions-only'
       ];
       var querySelections = [];
       var queryStringObject = {};
@@ -53,9 +59,6 @@ define([
             queryStringObject['asked_by'] = sessionModel.id;
           }
         }
-        if (querySelection.queryName === 'oldest-questions-first') {
-          queryStringObject['sort_by'] = '-date';
-        }
       });
 
       Backbone.history.navigate('#questions?' + $.param(queryStringObject), {
@@ -67,31 +70,49 @@ define([
       var self = this;
       var result = {};
       var rendered;
-      var questionsFetchData;
+      var questionsFetchData = {};
+      var overallQuestionsData = new Question({});
 
-      if (this.questionsQuery) {
-        questionsFetchData = $.param(this.questionsQuery);
+      if (!this.questionsQuery) {
+        this.questionsQuery = {};
       }
+      this.questionsQuery.page = this.currentPage;
 
-      this.questions.fetch({ 
-        data: questionsFetchData,
+      overallQuestionsData.fetch({
         success: function() {
-          if (self.questions.length > 0) {
-            result.questions = self.cleanseData(self.questions.toJSON());
+          pagination = self.determinePagination(overallQuestionsData.get("posts_found"));
 
-            $.extend(result, self.questionsQuery);
-
-            rendered = Mustache.to_html(questionListTemplate, result);
-            self.el = rendered;
-            opts.finished();
-
-            $(".my-questions-only").on('click', function(e){
-              self.questionsFilteringAndSortingClicked(e);
-            });
-            $(".oldest-questions-first").on('click', function(e){
-              self.questionsFilteringAndSortingClicked(e);
-            });
+          if (pagination === false) {
+            alert("Should this ever happen?");
           }
+
+          questionsFetchData = $.param(self.questionsQuery);
+
+          self.questions.fetch({ 
+            data: questionsFetchData,
+            success: function() {
+              if (self.questions.length > 0) {
+                result.questions = self.cleanseData(self.questions.toJSON());
+
+                $.extend(result, self.questionsQuery);
+                $.extend(result, pagination);
+
+                rendered = Mustache.to_html(questionListTemplate, result);
+                self.el = rendered;
+                opts.finished();
+
+                $(".my-questions-only").on('click', function(e){
+                  self.questionsFilteringAndSortingClicked(e);
+                });
+              } else {
+                alert('No questions available!');
+              }
+            },
+            error: function() {
+              //Reroute to 404
+              opts.finished();
+            }
+          });
         },
         error: function() {
           //Reroute to 404
@@ -106,6 +127,9 @@ define([
       data.forEach(function(dataObject){
         var differenceInMilliseconds = Date.now() - Date.parse(dataObject.createdAt);
 
+        if (!dataObject.upVoteTotal) {
+          dataObject.upVoteTotal = 0;
+        }
         if (dataObject.Comments) {
           dataObject.numberOfComments = dataObject.Comments.length;
         } else {
@@ -120,6 +144,69 @@ define([
       });
 
       return data;
+    },
+
+    //Function to figure out what page the user is on, and how to configure the pagination section at the footer
+    determinePagination: function (postsCount) {
+      var pagesPerSet = 8;              //How many of those numbers are in the footer
+      var totalNumberOfPages = Math.ceil(postsCount / 10);    //How many results per page
+      var allPageNumbers = [];
+      var i;
+      var prevArrowState;
+      var nextArrowState;
+      var totalNumberOfSets;
+      var currentSet;
+      var lastPageNumberRelatively;
+      var pageNum;
+
+      if (this.currentPage > totalNumberOfPages) {
+        return false;
+      }
+
+      totalNumberOfSets = Math.ceil(totalNumberOfPages / pagesPerSet);
+      currentSet = Math.ceil(this.currentPage / pagesPerSet);
+
+      if (currentSet < totalNumberOfSets) {
+        for (i = 1; i <= pagesPerSet; i++) {
+          pageNum = i + (Math.floor((this.currentPage - 1) / pagesPerSet)*pagesPerSet);
+          allPageNumbers.push({
+            num: pageNum,
+            active: pageNum == this.currentPage,
+            asked_by: this.questionsQuery.asked_by
+          }); 
+        }
+      } else {
+        lastPageNumberRelatively = totalNumberOfPages % pagesPerSet;
+
+        if (lastPageNumberRelatively === 0) {
+          lastPageNumberRelatively = 8;
+        }
+
+        for (i = 1; i <= pagesPerSet && i <= lastPageNumberRelatively; i++) {
+          pageNum = i + (Math.floor((this.currentPage - 1) / pagesPerSet)*pagesPerSet);
+          allPageNumbers.push({
+            num: pageNum,
+            active: pageNum == this.currentPage,
+            asked_by: this.questionsQuery.asked_by
+          }); 
+        }
+      }
+
+      //Set the prev and next arrow states
+      prevArrowState = {
+        state: currentSet > 1,
+        link: currentSet > 1 ? (allPageNumbers[0].num - 1): undefined
+      };
+      nextArrowState = {
+        state: currentSet < totalNumberOfSets,
+        link: currentSet < totalNumberOfSets ? (allPageNumbers[allPageNumbers.length - 1].num + 1): undefined
+      };
+
+      return {
+        pageNumbers: allPageNumbers,
+        prevArrow: prevArrowState,
+        nextArrow: nextArrowState
+      };
     }
   });
 
