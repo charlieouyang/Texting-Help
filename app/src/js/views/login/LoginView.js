@@ -35,9 +35,10 @@ define([
 
       e.preventDefault();
 
-      this.sessionModel.login({
+      this.sessionModel.login('email', {
         username: username,
-        password: password
+        password: password,
+        type: 'email'
       });
     }
 

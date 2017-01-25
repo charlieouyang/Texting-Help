@@ -18,7 +18,7 @@ define([
         if (sessionStorage.user && sessionStorage.user !== 'undefined') {
           userObject = JSON.parse(sessionStorage.user);
           userToken = userObject.token;
-          this.url = 'http://localhost:6080/api/users/' + userObject.username;
+          this.url = 'http://localhost:6080/api/users/username/' + userObject.username;
         } else {
           this.url = 'http://localhost:6080/api';
         }
@@ -71,7 +71,7 @@ define([
       }
     },
 
-    login: function(credentials) {
+    login: function(type, credentials, callback) {
       var that = this;
       var login = $.ajax({
         url: this.url + '/login',
@@ -89,19 +89,29 @@ define([
 
         that.set('authenticated', true);
         that.set('user', JSON.stringify(response));
+
+        if (response.id && response.type === 'facebook') {
+          $(".fb-user-container").show();
+          $(".fb-user-profile-picture").show();
+          return;
+        }
+
         if (that.get('redirectFrom')) {
           var path = that.get('redirectFrom');
           that.unset('redirectFrom');
-          Backbone.history.navigate(path, {
+          Backbone.history.navigate('', {
             trigger: true
           });
+          window.location.reload();
         } else {
           Backbone.history.navigate('', {
             trigger: true
           });
+          window.location.reload();
         }
       });
-      login.fail(function() {
+      login.fail(function(error) {
+        callback(error);
         Backbone.history.navigate('login', {
           trigger: true
         });
@@ -119,16 +129,10 @@ define([
     },
 
 
-    getAuth: function(callback) {
+    getAuth: function(type, callback) {
       var that = this;
       var user = this.get('user');
       var Session = this.fetch();
-
-      // if (FB) {
-      //   FB.getLoginStatus(function(response) {
-      //     console.log(response);
-      //   });
-      // }
 
       Session.done(function(response) {
         if (response && response.token) {

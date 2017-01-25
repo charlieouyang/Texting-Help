@@ -13,6 +13,7 @@
                 <a href="#question/create">Ask Question</a>
             </div>
             
+            {{^userTypeIsFacebook}}
             <div class="user-login-header">
                 {{#authenticated}}
                     {{#user}}
@@ -22,10 +23,11 @@
                     <span class="header-logout">Log out</span>
                 {{/authenticated}}
                 {{^authenticated}}
-                    <a href="#login">Log in</a><br>
+                    <a href="#login">E-mail Log in</a><br>
                     <a href="#user/create">New user</a>
                 {{/authenticated}}
             </div>
+            {{/userTypeIsFacebook}}
         </div>
     </div>
 </div>

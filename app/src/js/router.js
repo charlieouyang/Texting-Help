@@ -80,33 +80,38 @@ define([
 
     sessionModel.getAuth();
 
+    var footerView = new FooterView({session: sessionModel});
+    var headerView = new HeaderView({session: sessionModel});
+    headerView.render();
+    footerView.render();
+
     app_router.on('route:homePage', function (id) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var homeView = new HomeView({session: sessionModel});
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
         appView.showView(homeView);
     });
 
     app_router.on('route:loginPage', function (id) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var loginView = new LoginView({session: sessionModel});
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
         appView.showView(loginView);
     });
 
     app_router.on('route:userPage', function (id) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var userView = new UserView({session: sessionModel, userInUrlId: id});
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
         appView.showView(userView);
     });
 
@@ -115,25 +120,25 @@ define([
     });
 
     app_router.on('route:questionPage', function (id) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var questionView;
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
 
         questionView = new QuestionView({session: sessionModel, questionId: id});
         appView.showView(questionView);
     });
 
     app_router.on('route:questionsPage', function (queryString) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var questionsListView;
         var queryObject;
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
 
         if (queryString) {
           queryObject = Utils.parseQuery(queryString)
@@ -144,12 +149,12 @@ define([
     });
 
     app_router.on('route:createEditQuestionPage', function (id) {
-        var footerView = new FooterView({session: sessionModel});
-        var headerView = new HeaderView({session: sessionModel});
+        // var footerView = new FooterView({session: sessionModel});
+        // var headerView = new HeaderView({session: sessionModel});
         var questionCreateEditView = new CreateEditQuestionView({session: sessionModel});
 
-        headerView.render();
-        footerView.render();
+        // headerView.render();
+        // footerView.render();
         appView.showView(questionCreateEditView);
     });
 

@@ -66,7 +66,7 @@ module.exports = function (router) {
         postFindingOptions.include.push({
             model: User,
             as: 'User',
-            attributes: ['username', 'id']
+            attributes: ['username', 'id', 'name', 'type']
         });
 
         if (queryParams.asked_by) {
@@ -110,7 +110,7 @@ module.exports = function (router) {
                 include: [{
                     model: User,
                     as: 'User',
-                    attributes: ['username', 'id']
+                    attributes: ['username', 'id', 'name', 'type']
                 }]
             }).then(function(commentsReturned){
                 var commentOnIdToPostDict = {};
@@ -213,12 +213,12 @@ module.exports = function (router) {
                 include: [{
                     model: User,
                     as: 'User',
-                    attributes: ['username', 'id']
+                    attributes: ['username', 'id', 'name', 'type']
                 }]
             },{
                 model: User,
                 as: 'User',
-                attributes: ['username', 'id']
+                attributes: ['username', 'id', 'name', 'type']
             }],
             where: {
                 id: req.params.post_id
@@ -247,7 +247,7 @@ module.exports = function (router) {
                     include: [{
                         model: User,
                         as: 'User',
-                        attributes: ['username', 'id']
+                        attributes: ['username', 'id', 'name', 'type']
                     }]
                 }).then(function(commentsForQuestion){
                     dict.post.dataValues.Comments = commentsForQuestion;
@@ -268,7 +268,7 @@ module.exports = function (router) {
                             include: [{
                                 model: User,
                                 as: 'User',
-                                attributes: ['username', 'id']
+                                attributes: ['username', 'id', 'name', 'type']
                             }]
                         }).then(function(commentsForAnswers){
                             var commentOnIdToAnswerDict = {};

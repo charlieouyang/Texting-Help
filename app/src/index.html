@@ -39,7 +39,14 @@
 </head>
 
 <body>
-    <div id="fb-root"></div>
+    <div id="fb-root">
+    </div>
+    <div class="fb-user-container" style="display:none">
+      <img class="fb-user-profile-picture" src="" style="width: 35px;"></img>
+      <input id="fb-user-information" style="display:none"></input>
+      <button id="fb_login" type="button" class="btn btn-primary" style="background-image:linear-gradient(to bottom,#3b5998 0,#3b5998 100%);">Facebook Log In</button>
+      <button id="fb_logout" type="button" class="btn btn-primary" style="background-image:linear-gradient(to bottom,#3b5998 0,#3b5998 100%);">Facebook Log Out</button>
+    </div>
     <div id="header"></div>
     <div id="content"></div>
     <div id="footer"></div>
@@ -47,22 +54,91 @@
 
 <!--#####################  Facebook Login  ###################################-->
 <script>
-  //   window.fbAsyncInit = function() {
-  //   FB.init({
-  //     appId      : '592075137655325',
-  //     xfbml      : true,
-  //     version    : 'v2.6'
-  //   });
-  //   FB.AppEvents.logPageView();
-  // };
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '592071674322338',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();   
 
-  // (function(d, s, id){
-  //    var js, fjs = d.getElementsByTagName(s)[0];
-  //    if (d.getElementById(id)) {return;}
-  //    js = d.createElement(s); js.id = id;
-  //    js.src = "//connect.facebook.net/en_US/sdk.js";
-  //    fjs.parentNode.insertBefore(js, fjs);
-  //  }(document, 'script', 'facebook-jssdk'));
+    $("#fb_login").click(function() {
+      FB.login(Facebook_login_logout);
+    }); 
+
+    $("#fb_logout").click(function() {
+      FB.logout(Facebook_login_logout);
+    }); 
+
+    function Facebook_login_logout () {
+      FB.getLoginStatus(function(response) {
+        processResponseAndSetElements(response);
+      });      
+    }  
+
+    function processResponseAndSetElements(response) {
+      //This gets called on load of the page
+      //On load... see if the header is logged in... If it's logged in, then don't show this...
+      //Show this only if header is not logged in...
+      if ($(".user-login-header").find(".header-logout").length) {
+        //Logout is found... which means user is logged in old fashion way
+        $(".fb-user-container").hide();
+      } else {
+        if (response.status === 'connected') {
+          //User is only logged in using FB, so hide the old fashion log in way
+          $(".user-login-header").hide();
+
+          FB.api("/" + response.authResponse.userID, function(fbUser) {
+            FB.api("/" + response.authResponse.userID + "/picture", function(fbPicture) {
+              $(".fb-user-container").show();
+              $('.fb-user-container').css({
+                'position': 'absolute',
+                'right': '20px',
+                'top': '7px'
+              });
+              $("#fb_login").hide();
+              $("#fb_logout").show();
+              $(".fb-user-profile-picture").attr('src', fbPicture.data.url);
+
+              $("#fb-user-information").attr("fb-id", fbUser.id);
+              $("#fb-user-information").attr("name", fbUser.name);
+              $("#fb-user-information").val(fbUser.id).change();
+            });
+          });
+        } else {
+          //Show both.. because user isn't logged in at all
+          $(".fb-user-container").show();
+          $('.fb-user-container').css({
+            'position': 'absolute',
+            'right': '150px',
+            'top': '13px'
+          });
+          $(".user-login-header").show();
+          $("#fb_login").show();
+          $("#fb_logout").hide();
+          $(".fb-user-profile-picture").hide();
+
+          $("#fb-user-information").attr("fb-id", "");
+          $("#fb-user-information").attr("name", "");
+          $("#fb-user-information").val("").change();
+        }
+      }
+    }
+
+    FB.getLoginStatus(function(response) {
+      processResponseAndSetElements(response);
+    });
+  };
+
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
 </script>
 <!-- ######################################################################## -->
 

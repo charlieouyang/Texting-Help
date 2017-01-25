@@ -16,7 +16,7 @@
                 <div class="row col-md-11">
                     <p class="question-description">{{description}}</p>
                     {{#User}}
-                        <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">asked {{createdTimeDifference}}</small></label>
+                        <label><a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">asked {{createdTimeDifference}}</small></label>
                     {{/User}}
                 </div>
             </div>
@@ -29,7 +29,7 @@
                     </div>
                     <div class="row">
                     {{#User}}
-                        <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
+                        <label><a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
                     {{/User}}
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                     <div class="row col-md-11">
                         <p class="question-description">{{description}}</p>
                         {{#User}}
-                            <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">answered {{createdTimeDifference}}</small></label>
+                            <label><a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">answered {{createdTimeDifference}}</small></label>
                         {{/User}}
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="row">
                         {{#User}}
-                            <label><a href="#user/{{username}}">{{username}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
+                            <label><a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">commented {{createdTimeDifference}}</small></label>
                         {{/User}}
                         </div>
                     </div>

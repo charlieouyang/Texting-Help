@@ -20,21 +20,46 @@ module.exports = function (router) {
             'email': 'email',
             'createdAt': 'createdAt',
             'updatedAt': 'updatedAt',
-            'token': 'token'
+            'token': 'token',
+            'type': 'type'
         };
+
+    /*
+
+    Type: Email
+    Required: username, name, password, email
+
+    Type: Facebook
+    Required: username (fb-id), name (fb-name), password (store as 'fb-password')
+
+    */
 
     router.post('/login', function(req, res) {
         var data = req.body,
             username = "",
-            password = "";
+            password = "",
+            type = "";
 
         username = data['username'];
         password = data['password'];
+        type = data["type"];
 
-        if (!username || username === "" || !password || password === "") {
-            var errorResponse = {message: 'Invalid username or password'};
+        if (!username || username === "") {
+            var errorResponse = {message: 'Invalid username'};
             res.statusCode = 401; //Unauthorized
             return res.json(errorResponse);
+        } else if ((!password || password === "") && (!type || type === "")) {
+            var errorResponse = {message: 'You have to pass in password or type is facebook'};
+            res.statusCode = 401; //Unauthorized
+            return res.json(errorResponse);
+        } else if ((type === 'email') && (!password || password === "")) {
+            var errorResponse = {message: 'Type is email, so you have to pass in password'};
+            res.statusCode = 401; //Unauthorized
+            return res.json(errorResponse);
+        }
+
+        if (type === 'facebook') {
+            password = "fb-password";
         }
 
         User.find({
@@ -66,7 +91,7 @@ module.exports = function (router) {
         });
     });
 
-    router.get('/users/:username', function(req, res, next) {
+    router.get('/users/username/:username', function(req, res, next) {
         User.find({
             where:{username: req.params.username}
         }).then(function(user) {
@@ -88,7 +113,29 @@ module.exports = function (router) {
         });
     });
 
-    router.put('/users/:username', auth, function(req, res) {
+    router.get('/users/:user_id', function(req, res, next) {
+        User.find({
+            where:{id: req.params.user_id}
+        }).then(function(user) {
+            var dict = {};
+            if (user) {
+                for (var key in availableFields) {
+                    if (availableFields.hasOwnProperty(key)) {
+                        dict[availableFields[key]] = user[key];
+                    }
+                }
+            } else {
+                dict = {message: 'Not Found'};
+                res.statusCode = 404;
+            }
+
+            return res.json(dict);
+        }).catch(function() {
+            next();
+        });
+    });
+
+    router.put('/users/:user_id', auth, function(req, res) {
         var data = req.body,
             acceptedField = {
                 'name': 'name',
@@ -107,7 +154,7 @@ module.exports = function (router) {
 
         User.update(valid, {
             where: { 
-                username: req.params.username
+                id: req.params.user_id
             }
         })
         .then(function(user, meta, anotherAttr){
@@ -135,11 +182,11 @@ module.exports = function (router) {
         });
     });
 
-    router.delete('/users/:username', auth, function(req, res) {
+    router.delete('/users/:user_id', auth, function(req, res) {
 
         User.destroy({
             where: { 
-                username: req.params.username
+                id: req.params.user_id
             }
         })
         .then(function(user, meta, anotherAttr){
@@ -167,7 +214,6 @@ module.exports = function (router) {
         });
     });
 
-    //TODO: undo of REMOVED AUTH for dev purposes
     router.post('/users', function(req, res) {
         var data = req.body,
             acceptedField = {
@@ -183,6 +229,11 @@ module.exports = function (router) {
                 var dataKey = acceptedField[key];
                 valid[key] = data[dataKey];
             }
+        }
+
+        if (data.type === 'facebook') {
+            valid.password = 'fb-password';
+            valid.email = 'dummy_email@facebook.com';
         }
 
         User.create(valid).then(function(user) {

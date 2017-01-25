@@ -72,13 +72,19 @@ define([
       var rendered;
       var questionsFetchData = {};
       var overallQuestionsData = new Question({});
+      var overallQuestionsDataFetchParams = {};
 
       if (!this.questionsQuery) {
         this.questionsQuery = {};
       }
       this.questionsQuery.page = this.currentPage;
 
+      if (this.questionsQuery.asked_by) {
+        overallQuestionsDataFetchParams.asked_by = this.questionsQuery.asked_by;
+      }
+
       overallQuestionsData.fetch({
+        data: overallQuestionsDataFetchParams,
         success: function() {
           pagination = self.determinePagination(overallQuestionsData.get("posts_found"));
 
