@@ -9,12 +9,24 @@ Please visit those folders for more information about them.
 
 ## Backlog
 
-1) Hide "My Questions" when no user is logged in
+DONE
+1) Hide "My Questions" when no user is logged in and add "showing questions... 1 - 10 of total questions"
 
+DONE
 2) Users page... Hide sections for FB Users
 
+DONE
 3) Asking a question... It fails for POST request getting cancelled... Add some sort of try/catch
 
-4) Searching through quesetions
+DONE
+4) Searching through questions
 
 5) User input next line symbols
+
+6) Add legit Facebook log in and log out buttons
+
+7) Add app wide loading modal in index.html... use jQuery to show and hide it in each view
+
+8) Enable click on the profile picture in the header for FB users to hit user page
+
+9) Error handling for search... When no questions come back

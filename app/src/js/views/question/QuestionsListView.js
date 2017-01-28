@@ -28,7 +28,8 @@ define([
       //Meaning if user wants it selected, the previous state is unslected
       var self = this;
       var allSelections = [
-        'my-questions-only'
+        'my-questions-only',
+        'search-questions-term'
       ];
       var querySelections = [];
       var queryStringObject = {};
@@ -61,6 +62,10 @@ define([
         }
       });
 
+      if ($(".search-questions-term")[0].value !== "") {
+        queryStringObject['search'] = $(".search-questions-term")[0].value;
+      }
+
       Backbone.history.navigate('#questions?' + $.param(queryStringObject), {
         trigger: true
       });
@@ -83,6 +88,10 @@ define([
         overallQuestionsDataFetchParams.asked_by = this.questionsQuery.asked_by;
       }
 
+      if (this.questionsQuery.search) {
+        overallQuestionsDataFetchParams.search = this.questionsQuery.search;
+      }
+
       overallQuestionsData.fetch({
         data: overallQuestionsDataFetchParams,
         success: function() {
@@ -98,6 +107,7 @@ define([
             data: questionsFetchData,
             success: function() {
               if (self.questions.length > 0) {
+                result.userLoggedIn = self.sessionModel.get('user') ? true : false;
                 result.questions = self.cleanseData(self.questions.toJSON());
 
                 $.extend(result, self.questionsQuery);
@@ -107,9 +117,17 @@ define([
                 self.el = rendered;
                 opts.finished();
 
+                if (self.questionsQuery.search) {
+                  $(".search-questions-term")[0].value = self.questionsQuery.search;
+                }
+
                 $(".my-questions-only").on('click', function(e){
                   self.questionsFilteringAndSortingClicked(e);
                 });
+
+                $(".search-questions").on('click', function(e){
+                  self.questionsFilteringAndSortingClicked(e);
+                })
               } else {
                 alert('No questions available!');
               }
@@ -164,10 +182,28 @@ define([
       var currentSet;
       var lastPageNumberRelatively;
       var pageNum;
+      var currentQuestionsViewInformation;
+      var finalPageRange;
+      var startingPageRange;
 
       if (this.currentPage > totalNumberOfPages) {
         return false;
       }
+
+      if (10 * this.currentPage > postsCount) {
+        finalPageRange = postsCount;
+      } else {
+        finalPageRange = 10 * this.currentPage;
+      }
+
+      if (this.currentPage === 1) {
+        startingPageRange = 1;
+      } else {
+        startingPageRange = ((this.currentPage - 1) * 10) + 1;
+      }
+
+      currentQuestionsViewInformation = startingPageRange + 
+        " - " + finalPageRange + " out of " + postsCount + " questions";
 
       totalNumberOfSets = Math.ceil(totalNumberOfPages / pagesPerSet);
       currentSet = Math.ceil(this.currentPage / pagesPerSet);
@@ -209,6 +245,7 @@ define([
       };
 
       return {
+        currentQuestionsViewInformation: currentQuestionsViewInformation,
         pageNumbers: allPageNumbers,
         prevArrow: prevArrowState,
         nextArrow: nextArrowState

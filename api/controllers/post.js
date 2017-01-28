@@ -70,16 +70,27 @@ module.exports = function (router) {
         });
 
         if (queryParams.asked_by) {
-            postFindingOptions.where = {};
+            if (!postFindingOptions.where) {
+                postFindingOptions.where = {};
+            }
             postFindingOptions.where.UserId = queryParams.asked_by;
         }
 
-        if (queryParams.sort_by) {
-            sortByValue = queryParams.sort_by
-
-            if (sortByValue.substring(1, sortByValue.length) === 'date') {
-                sortByDateLatest = sortByValue[0] === '-' ? false : true;
+        if (queryParams.search) {
+            if (!postFindingOptions.where) {
+                postFindingOptions.where = {};
             }
+            postFindingOptions.where['$or'] = [];
+            postFindingOptions.where['$or'].push({ 
+                title: {
+                    $like: '%' + queryParams.search + '%'
+                }
+            });
+            postFindingOptions.where['$or'].push({
+                description: {
+                    $like: '%' + queryParams.search + '%'
+                }
+            });
         }
 
         Post.findAndCountAll(postFindingOptions).then(function(posts) {

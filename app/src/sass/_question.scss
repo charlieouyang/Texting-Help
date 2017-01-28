@@ -61,6 +61,10 @@
   }
 }
 
+.questions-information {
+  padding-bottom: 10px;
+}
+
 .questions-list {
   .time-difference-text {
     padding: 18px;
@@ -80,18 +84,18 @@
   .badge-success {
     background-color: #14892c;;
     margin-right: 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .badge-primary {
     background-color: #229ecc;
     margin-right: 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .badge-default {
     background-color: #b2880c;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .question-list-badges {

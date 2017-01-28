@@ -38,6 +38,13 @@ define([
                 result.user = self.userModel.toJSON();
                 result.user.point_total = self.pointModel.get('point_total');
                 sessionUser = sessionModel.get('user');
+
+                if (result.user.type === 'facebook') {
+                  result.user.isFacebook = true;
+                } else {
+                  result.user.isEmail = true;
+                }
+
                 if (sessionUser && sessionUser.username && sessionUser.username === self.userModel.get('username')) {
                   result.user.editable = true;
                   rendered = Mustache.to_html(userTemplate, result);

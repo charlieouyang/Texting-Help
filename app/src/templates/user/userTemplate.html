@@ -10,20 +10,30 @@
               <label>Full Name</label>
               <input class="form-control fullname" placeholder="Enter your full name" value="{{name}}">
             </div>
+            {{#isEmail}}
             <div class="form-group">
               <label>User Name</label>
               <input class="form-control username" placeholder="Enter your user name" value="{{username}}" disabled>
             </div>
+            {{/isEmail}}
+            <div class="form-group">
+              <label>User Type</label>
+              <input class="form-control username"  value="{{type}}" disabled>
+            </div>
+            {{#isEmail}}
             <div class="form-group">
               <label>E-Mail</label>
               <input class="form-control email" placeholder="Enter your e-mail" value="{{email}}">
             </div>
+            {{/isEmail}}
             <div class="form-group">
               <label>Point Total</label>
               <br>
               <label>{{point_total}}</label>
             </div>
+            {{#isEmail}}
             <button type="submit" class="btn btn-primary update-user">Update User</button>
+            {{/isEmail}}
           </form>
           {{/editable}}
           {{^editable}}
@@ -31,9 +41,14 @@
           <br>
           <label>Name: &nbsp;</label><span>{{name}}</span>
           <br>
+          <label>User Type: &nbsp;</label><span>{{type}}</span>
+          <br>
+          {{#isEmail}}
           <label>E-mail: &nbsp;</label><span>{{email}}</span>
           <br>
           <label>User Name: &nbsp;</label><span>{{username}}</span>
+          <br>
+          {{/isEmail}}
           <label>Point Total: &nbsp;</label><span>{{point_total}}</span>
           {{/editable}}
         {{/user}}

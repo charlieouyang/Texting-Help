@@ -15,6 +15,7 @@ define([
       this.question = new Question({
         id: opts.questionId
       });
+      this.userSession = opts.session;
     },
 
     render: function(opts){
@@ -46,6 +47,10 @@ define([
         self.el = rendered;
         opts.finished();
 
+        if (self.userSession.get('authenticated') !== 'true') {
+          alert('Please log in to create post a question!');
+        }
+
         $(".post-question").on("click", function(e){
           self.postQuestionClick(e);
         });
@@ -65,12 +70,12 @@ define([
           description: questionDescription, 
           tags: ''
         }, {
-          success: function() {
+          success: function(questionModel) {
             //hard refresh of the page to get logged out state
             Backbone.history.navigate('#questions', true);
           },
-          error: function() {
-            alert('Posting failed... Maybe user token is stale? Please logout and login again.');
+          error: function(error) {
+            alert('Please log in to create post a question!');
           }
         });
       }
