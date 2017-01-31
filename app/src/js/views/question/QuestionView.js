@@ -28,6 +28,8 @@ define([
 
       this.votes = [];
 
+      Utils.showPageLoadingModal();
+
       this.question.fetch({
         success: function() {
           self.votes.push(new Vote({
@@ -48,6 +50,8 @@ define([
             rendered = Mustache.to_html(questionTemplate, result);
             self.el = rendered;
             opts.finished();
+
+            Utils.hidePageLoadingModal();
 
             $(".add-a-comment").on('click', function(e){
               self.addACommentClick(e);
@@ -172,12 +176,15 @@ define([
         commentOptions.description = commentText;
         commentOptions.post_or_answer_owner_user = originalPostOrAnswerUserId;
 
+        Utils.showPageLoadingModal();
         commentModel.save(commentOptions, {
           success: function() {
+            Utils.hidePageLoadingModal();
             //hard refresh of the page to get logged out state
             window.location.reload();
           },
           error: function() {
+            Utils.hidePageLoadingModal();
             alert('Posting failed... Maybe user token is stale? Please logout and login again.');
           }
         });
@@ -201,12 +208,15 @@ define([
       answerOptions.description = answerText;
       answerOptions.post_or_answer_owner_user = postOwnerUserId;
 
+      Utils.showPageLoadingModal();
       answerModel.save(answerOptions, {
         success: function() {
           //hard refresh of the page to get logged out state
+          Utils.hidePageLoadingModal();
           window.location.reload();
         },
         error: function() {
+          Utils.hidePageLoadingModal();
           alert('Posting failed... Maybe user token is stale? Please logout and login again.');
         }
       });

@@ -21,12 +21,25 @@ DONE
 DONE
 4) Searching through questions
 
+DONE
 5) User input next line symbols
 
+DONE
 6) Add legit Facebook log in and log out buttons
 
+DONE
 7) Add app wide loading modal in index.html... use jQuery to show and hide it in each view
 
+DONE
 8) Enable click on the profile picture in the header for FB users to hit user page
 
+DONE
 9) Error handling for search... When no questions come back
+
+10) Edit of questions
+
+11) Edit of answers
+
+12) Handle empty comments, answers, and posts
+
+12) Edit of comments?

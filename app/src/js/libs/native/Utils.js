@@ -6,6 +6,14 @@ define([
 
   var Texting = {};
 
+  Texting.showPageLoadingModal = function(title, description) {
+    $("#page-modal").modal('show');
+  };
+
+  Texting.hidePageLoadingModal = function() {
+    $("#page-modal").modal('hide');
+  };
+
   Texting.parseQuery = function(qstr) {
     var query = {};
     var a = (qstr[0] === '?' ? qstr.substr(1) : qstr).split('&');

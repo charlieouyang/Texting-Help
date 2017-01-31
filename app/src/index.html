@@ -46,12 +46,25 @@
         <img class="fb-user-profile-picture" src="" style="width: 35px;"></img>
       </a>
       <input id="fb-user-information" style="display:none"></input>
-      <button id="fb_login" type="button" class="btn btn-primary" style="background-image:linear-gradient(to bottom,#3b5998 0,#3b5998 100%);">Facebook Log In</button>
-      <button id="fb_logout" type="button" class="btn btn-primary" style="background-image:linear-gradient(to bottom,#3b5998 0,#3b5998 100%);">Facebook Log Out</button>
+      <div id="fb_login_container" style="width: 116px;float: right;margin-left: 10px;">
+        <img id="fb_login" style="width: 100%; height: auto;cursor: pointer;" src="imgs/fb-login.png"></img>
+      </div>
+      <div id="fb_logout_container" style="width: 125px;float: right;margin-left: 10px;">
+        <img id="fb_logout" style="width: 100%; height: auto;cursor: pointer;" src="imgs/fb-logout.png"></img>
+      </div>
     </div>
     <div id="header"></div>
     <div id="content"></div>
     <div id="footer"></div>
+    <div id="page-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header" style="text-align: center;">
+            <h2 class="modal-title">Loading...</h2>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 
 <!--#####################  Facebook Login  ###################################-->
@@ -99,8 +112,8 @@
                 'right': '20px',
                 'top': '7px'
               });
-              $("#fb_login").hide();
-              $("#fb_logout").show();
+              $("#fb_login_container").hide();
+              $("#fb_logout_container").show();
               $(".fb-user-profile-picture").attr('src', fbPicture.data.url);
 
               $("#fb-user-information").attr("fb-id", fbUser.id);
@@ -117,8 +130,8 @@
             'top': '13px'
           });
           $(".user-login-header").show();
-          $("#fb_login").show();
-          $("#fb_logout").hide();
+          $("#fb_login_container").show();
+          $("#fb_logout_container").hide();
           $(".fb-user-profile-picture").hide();
 
           $("#fb-user-information").attr("fb-id", "");

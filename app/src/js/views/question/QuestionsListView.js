@@ -79,6 +79,8 @@ define([
       var overallQuestionsData = new Question({});
       var overallQuestionsDataFetchParams = {};
 
+      Utils.showPageLoadingModal();
+
       if (!this.questionsQuery) {
         this.questionsQuery = {};
       }
@@ -97,40 +99,63 @@ define([
         success: function() {
           pagination = self.determinePagination(overallQuestionsData.get("posts_found"));
 
-          if (pagination === false) {
-            alert("Should this ever happen?");
-          }
-
           questionsFetchData = $.param(self.questionsQuery);
 
           self.questions.fetch({ 
             data: questionsFetchData,
             success: function() {
-              if (self.questions.length > 0) {
-                result.userLoggedIn = self.sessionModel.get('user') ? true : false;
-                result.questions = self.cleanseData(self.questions.toJSON());
+              result.userLoggedIn = self.sessionModel.get('user') ? true : false;
+              result.questions = self.cleanseData(self.questions.toJSON());
 
-                $.extend(result, self.questionsQuery);
-                $.extend(result, pagination);
+              $.extend(result, self.questionsQuery);
+              $.extend(result, pagination);
 
-                rendered = Mustache.to_html(questionListTemplate, result);
-                self.el = rendered;
-                opts.finished();
+              rendered = Mustache.to_html(questionListTemplate, result);
+              self.el = rendered;
+              opts.finished();
 
-                if (self.questionsQuery.search) {
-                  $(".search-questions-term")[0].value = self.questionsQuery.search;
-                }
+              Utils.hidePageLoadingModal();
 
-                $(".my-questions-only").on('click', function(e){
-                  self.questionsFilteringAndSortingClicked(e);
-                });
-
-                $(".search-questions").on('click', function(e){
-                  self.questionsFilteringAndSortingClicked(e);
-                })
-              } else {
-                alert('No questions available!');
+              if (self.questionsQuery.search) {
+                $(".search-questions-term")[0].value = self.questionsQuery.search;
               }
+
+              $(".my-questions-only").on('click', function(e) {
+                self.questionsFilteringAndSortingClicked(e);
+              });
+
+              $(".search-questions").on('click', function(e) {
+                self.questionsFilteringAndSortingClicked(e);
+              });
+
+
+              // if (self.questions.length > 0) {
+              //   result.userLoggedIn = self.sessionModel.get('user') ? true : false;
+              //   result.questions = self.cleanseData(self.questions.toJSON());
+
+              //   $.extend(result, self.questionsQuery);
+              //   $.extend(result, pagination);
+
+              //   rendered = Mustache.to_html(questionListTemplate, result);
+              //   self.el = rendered;
+              //   opts.finished();
+
+              //   Utils.hidePageLoadingModal();
+
+              //   if (self.questionsQuery.search) {
+              //     $(".search-questions-term")[0].value = self.questionsQuery.search;
+              //   }
+
+              //   $(".my-questions-only").on('click', function(e){
+              //     self.questionsFilteringAndSortingClicked(e);
+              //   });
+
+              //   $(".search-questions").on('click', function(e){
+              //     self.questionsFilteringAndSortingClicked(e);
+              //   })
+              // } else {
+              //   alert('No questions available!');
+              // }
             },
             error: function() {
               //Reroute to 404

@@ -93,6 +93,7 @@ define([
         if (response.id && response.type === 'facebook') {
           $(".fb-user-container").show();
           $(".fb-user-profile-picture").show();
+          $(".fb-profile-picture-link").attr('href', '#user/' + response.id);
           return;
         }
 

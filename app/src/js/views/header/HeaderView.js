@@ -79,11 +79,12 @@ define([
                 }
               });
             } else {
-              //Found fb user in text-help DB... 
             }
           });
         } else {
-          //It's already authenticated..
+          var userObject = self.sessionModel.get('user');
+
+          $(".fb-profile-picture-link").attr('href', '#user/' + userObject.id);
         }
       });
 
