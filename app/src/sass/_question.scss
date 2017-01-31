@@ -128,7 +128,11 @@
 
   .question-description {
     font-size: 17px;
-    white-space: pre;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word; 
   }
 
   .comments-list-on-post {
@@ -138,6 +142,15 @@
   .comment-on-post-description {
     margin: 0;
     font-size: 15px;
+  }
+
+  .post-answer-edit {
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .edit-icon-post-answer{
+    color: #333;
   }
 }
 

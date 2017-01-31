@@ -42,4 +42,10 @@ DONE
 
 12) Handle empty comments, answers, and posts
 
-12) Edit of comments?
+14) Add a last updated time
+
+DONE
+13) FB log in log out set round edges
+
+14) Error handling... Replace all alerts with error page or modal or something...
+  a) 

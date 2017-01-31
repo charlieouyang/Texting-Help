@@ -16,7 +16,12 @@
                 <div class="row col-md-11">
                     <p class="question-description">{{description}}</p>
                     {{#User}}
-                        <label><a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">asked {{createdTimeDifference}}</small></label>
+                        <label>
+                            <a href="#user/{{id}}">{{name}}</a> <small class="text-muted time-difference-text">asked {{createdTimeDifference}}</small>
+                            {{#canEditPost}}
+                                <a href="{{editPostLink}}" class="edit-icon-post-answer"><span class="glyphicon glyphicon-pencil post-answer-edit" aria-hidden="true"></span></a>
+                            {{/canEditPost}}
+                        </label>
                     {{/User}}
                 </div>
             </div>

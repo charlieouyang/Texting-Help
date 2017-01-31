@@ -25,16 +25,23 @@ define([
 
       if (this.question.id) {
         //Edit a pre-existing question
+        //Make sure this current user can edit the question
         this.question.fetch({
           success: function() {
-            result = self.cleanseData(self.question.toJSON());
-            rendered = Mustache.to_html(questionCreateEditTemplate, result);
-            self.el = rendered;
-            opts.finished();
+            if (self.userSession && self.userSession.get('user') && 
+              self.userSession.get('user').id === self.question.get('post').User.id) {
+              
+              result = self.question.toJSON();
+              rendered = Mustache.to_html(questionCreateEditTemplate, result);
+              self.el = rendered;
+              opts.finished();
 
-            $(".post-question").on("click", function(e){
-              self.postQuestionClick(e);
-            });
+              $(".post-question").on("click", function(e){
+                self.postQuestionClick(e);
+              });
+            } else {
+              alert('You are not allowed to edit this! You must be the creater of this question or answer to edit it...');
+            }
           },
           error: function() {
             //Reroute to 404
@@ -72,7 +79,7 @@ define([
         }, {
           success: function(questionModel) {
             //hard refresh of the page to get logged out state
-            Backbone.history.navigate('#questions', true);
+            Backbone.history.navigate('#question/' + questionModel.get('id'), true);
           },
           error: function(error) {
             alert('Please log in to create post a question!');

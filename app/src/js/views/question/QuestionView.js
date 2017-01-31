@@ -258,6 +258,14 @@ define([
       data.post.vote = votesToPostDictionary[data.post.id];
       self.checkUserVotedForPostOrAnswer(data.post, data.post.vote.votes);
 
+      //can this current user edit this post?
+      if (self.userSession && self.userSession.get('user') && self.userSession.get('user').id === data.post.User.id) {
+        data.post.canEditPost = true;
+        data.post.editPostLink = '#question/' + data.post.id + '/edit';
+      } else {
+        data.post.canEditPost = false;
+      }
+
       //Get the comments... Set the time
       postComments = data.post.Comments;
       delete data.post.Comments;
@@ -275,6 +283,13 @@ define([
         dataObject.createdTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
         dataObject.vote = votesToAnswerDictionary[dataObject.id];
         self.checkUserVotedForPostOrAnswer(dataObject, dataObject.vote.votes);
+
+        //can this current user edit this answer?
+        if (self.userSession && self.userSession.get('user') && self.userSession.get('user').id === dataObject.User.id) {
+          dataObject.canEditAnswer = true;
+        } else {
+          dataObject.canEditAnswer = false;
+        }
 
         if (dataObject.Comments) {
           answerComments = dataObject.Comments;

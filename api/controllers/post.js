@@ -369,4 +369,57 @@ module.exports = function (router) {
             res.json(dict);
         });
     });
+
+    router.put('/post/:post_id', auth, function(req, res) {
+        var data = req.body,
+            acceptedField = {
+                'title': 'title',
+                'description': 'description',
+                'tags': 'tags'
+            },
+            valid = {};
+
+        for (var key in acceptedField) {
+            if (acceptedField.hasOwnProperty(key)) {
+                var dataKey = acceptedField[key];
+                valid[key] = data[dataKey];
+            }
+        }
+
+        Post.findAll({
+            where: {
+                id: req.params.post_id
+            }
+        }).then(function(posts) {
+            var dict = {};
+            var post;
+
+            if (posts.length < 1) {
+                dict.message ='Cannot find you are trying to update!';
+                dict.answers_found = posts.length;
+                res.statusCode = 404;
+                res.json(dict);
+            } else {
+                post = posts[0];
+
+                post.update(valid).then(function(updatedPostObject){
+                    dict.message ='Post updated!!';
+                    res.statusCode = 200;
+                    dict.post = updatedPostObject;
+                    res.json(dict);
+                }).catch(function(){
+                    dict.message ='Found the post, but something went wrong during update!!';
+                    res.statusCode = 500;
+                    res.json(dict);
+                });
+            }
+        }).catch(function(error) {
+            var dict = {};
+            res.statusCode = 500;
+
+            dict.message = 'Get posts failed';
+            dict.error = error;
+            res.json(dict);
+        });
+    });
 };

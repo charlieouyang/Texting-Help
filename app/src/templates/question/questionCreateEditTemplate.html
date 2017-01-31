@@ -1,15 +1,19 @@
 <div class="container single-question">
     <div class="col-md-12">
     {{#post}}
-        <div class="question-title">
-            <h2>{{title}}</h2>
-        </div>
-        <div class="jumbotron">
-            <div class="row">
-                <p class="question-description">{{description}}</p>
+        <h2>Edit the question</h2>
+        <form class="question-create-edit-form">
+            <div class="form-group">
+                <label>Title</label>
+                <input class="form-control question-title" placeholder="Enter title" value="{{title}}">
+                <small class="form-text text-muted">Provide a condensed summary of your question</small>
             </div>
-
-        </div>
+            <div class="form-group">
+                <label>Question</label>
+                <textarea class="form-control question-description" rows="5">{{description}}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary post-question">Post Question</button>
+        </form>
     {{/post}}
 
     {{^post}}
