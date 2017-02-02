@@ -3,12 +3,12 @@
     {{#post}}
         <h2>Edit the question</h2>
         <form class="question-create-edit-form">
-            <div class="form-group">
+            <div class="form-group question-title-form-group">
                 <label>Title</label>
                 <input class="form-control question-title" placeholder="Enter title" value="{{title}}">
                 <small class="form-text text-muted">Provide a condensed summary of your question</small>
             </div>
-            <div class="form-group">
+            <div class="form-group question-description-form-group">
                 <label>Question</label>
                 <textarea class="form-control question-description" rows="5">{{description}}</textarea>
             </div>
@@ -19,12 +19,12 @@
     {{^post}}
         <h2>Ask Question</h2>
         <form class="question-create-edit-form">
-            <div class="form-group">
+            <div class="form-group question-title-form-group">
                 <label>Title</label>
                 <input class="form-control question-title" placeholder="Enter title">
                 <small class="form-text text-muted">Provide a condensed summary of your question</small>
             </div>
-            <div class="form-group">
+            <div class="form-group question-description-form-group">
                 <label>Question</label>
                 <textarea class="form-control question-description" rows="5"></textarea>
             </div>

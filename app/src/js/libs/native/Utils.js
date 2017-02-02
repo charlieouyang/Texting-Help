@@ -14,6 +14,38 @@ define([
     $("#page-modal").modal('hide');
   };
 
+  Texting.validateFormFields = function(fields) {
+    //fields should be array of objects
+    //each object will be 1 key value pair
+      //key is form class selector, and value is class selector of value
+    //If any of the fields that we look for are empty string, 
+      //then we will set error and return false
+    var validateSucceeded = true;
+    var formSelectorStr;
+    var elementSelectorStr;
+
+    fields.forEach(function(field){
+      for (var key in field){
+        formSelectorStr = key;
+      }
+      $("." + formSelectorStr).removeClass('has-error');
+    });
+    
+    fields.forEach(function(field){
+      for (var key in field){
+        formSelectorStr = key;
+        elementSelectorStr = field[key];
+      }
+
+      if ($("." + elementSelectorStr)[0].value === undefined || $("." + elementSelectorStr)[0].value === "") {
+        validateSucceeded = false;
+        $("." + formSelectorStr).addClass('has-error');
+      }
+    });
+
+    return validateSucceeded;
+  },
+
   Texting.parseQuery = function(qstr) {
     var query = {};
     var a = (qstr[0] === '?' ? qstr.substr(1) : qstr).split('&');

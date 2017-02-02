@@ -127,35 +127,6 @@ define([
               $(".search-questions").on('click', function(e) {
                 self.questionsFilteringAndSortingClicked(e);
               });
-
-
-              // if (self.questions.length > 0) {
-              //   result.userLoggedIn = self.sessionModel.get('user') ? true : false;
-              //   result.questions = self.cleanseData(self.questions.toJSON());
-
-              //   $.extend(result, self.questionsQuery);
-              //   $.extend(result, pagination);
-
-              //   rendered = Mustache.to_html(questionListTemplate, result);
-              //   self.el = rendered;
-              //   opts.finished();
-
-              //   Utils.hidePageLoadingModal();
-
-              //   if (self.questionsQuery.search) {
-              //     $(".search-questions-term")[0].value = self.questionsQuery.search;
-              //   }
-
-              //   $(".my-questions-only").on('click', function(e){
-              //     self.questionsFilteringAndSortingClicked(e);
-              //   });
-
-              //   $(".search-questions").on('click', function(e){
-              //     self.questionsFilteringAndSortingClicked(e);
-              //   })
-              // } else {
-              //   alert('No questions available!');
-              // }
             },
             error: function() {
               //Reroute to 404
@@ -174,7 +145,15 @@ define([
       var self = this;
 
       data.forEach(function(dataObject){
-        var differenceInMilliseconds = Date.now() - Date.parse(dataObject.createdAt);
+        var differenceInMilliseconds;
+
+        if (dataObject.createdAt === dataObject.updatedAt) {
+          differenceInMilliseconds = Date.now() - Date.parse(dataObject.createdAt);
+          dataObject.createdTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+        } else {
+          differenceInMilliseconds = Date.now() - Date.parse(dataObject.updatedAt);
+          dataObject.updatedTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+        }
 
         if (!dataObject.upVoteTotal) {
           dataObject.upVoteTotal = 0;
@@ -189,7 +168,6 @@ define([
         } else {
           dataObject.numberOfAnswers = 0;
         }
-        dataObject.createdTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
       });
 
       return data;

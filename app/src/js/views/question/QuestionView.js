@@ -149,9 +149,9 @@ define([
     addACommentClick: function (e) {
       var self = this;
       var commentParentDiv = $(e.currentTarget).closest('.add-a-comment-row');
-      var commentHtmlText = '<div class="form-group">'+
+      var commentHtmlText = '<div class="form-group add-a-comment-container">'+
                     '<label for="comment">Comment:</label>'+
-                    '<textarea class="form-control" rows="2"></textarea>'+
+                    '<textarea class="form-control comment-description" rows="2"></textarea>'+
                     '<button class="btn btn-info comment-answer-button comment-submit">Submit</button>'+
                 '</div>';
 
@@ -167,6 +167,12 @@ define([
         var originalPostOrAnswerUserId = commentContainer.getAttribute("post_or_answer_owner_user_id");
         var commentModel = new Comment();
         var commentOptions = {};
+
+        if (!Utils.validateFormFields([{
+          'add-a-comment-container': 'comment-description'
+        }])) {
+          return;
+        }
 
         if (commentType === 'post') {
           commentOptions.post_id = commentTypeId;
@@ -203,6 +209,12 @@ define([
       var postId = answerContainer.getAttribute('post-id');
       var answerModel = new Answer();
       var answerOptions = {};
+
+      if (!Utils.validateFormFields([{
+        'answer-description-container': 'answer-description'
+      }])) {
+        return;
+      }
 
       answerOptions.post_id = postId;
       answerOptions.description = answerText;
@@ -255,6 +267,13 @@ define([
       //Get the post... Set the time
       differenceInMilliseconds = Date.now() - Date.parse(data.post.createdAt);
       data.post.createdTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+      if (data.post.createdAt !== data.post.updatedAt) {
+        differenceInMilliseconds = Date.now() - Date.parse(data.post.updatedAt);
+        data.post.updatedTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+      } else {
+        data.post.updatedTimeDifference = false;
+      }
+      
       data.post.vote = votesToPostDictionary[data.post.id];
       self.checkUserVotedForPostOrAnswer(data.post, data.post.vote.votes);
 
@@ -281,12 +300,20 @@ define([
       data.post.Answers.forEach(function(dataObject){
         differenceInMilliseconds = Date.now() - Date.parse(dataObject.createdAt);
         dataObject.createdTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+        if (dataObject.createdAt !== dataObject.updatedAt) {
+          differenceInMilliseconds = Date.now() - Date.parse(dataObject.updatedAt);
+          dataObject.updatedTimeDifference = Utils.calculateTimeDifference(differenceInMilliseconds);
+        } else {
+          dataObject.updatedTimeDifference = false;
+        }
+
         dataObject.vote = votesToAnswerDictionary[dataObject.id];
         self.checkUserVotedForPostOrAnswer(dataObject, dataObject.vote.votes);
 
         //can this current user edit this answer?
         if (self.userSession && self.userSession.get('user') && self.userSession.get('user').id === dataObject.User.id) {
           dataObject.canEditAnswer = true;
+          dataObject.editAnswerLink = '#answer/' + dataObject.id + '/edit';
         } else {
           dataObject.canEditAnswer = false;
         }

@@ -3,11 +3,12 @@ define([
   'underscore',
   'backbone',
   'Mustache',
+  'Utils',
   'models/QuestionModel',
   'models/CommentModel',
   'models/AnswerModel',
   'text!templates/question/questionCreateEditTemplate.html'
-], function($, _, Backbone, Mustache, Question, Comment, Answer, questionCreateEditTemplate){
+], function($, _, Backbone, Mustache, Utils, Question, Comment, Answer, questionCreateEditTemplate){
 
   var QuestionsView = Backbone.View.extend({
 
@@ -68,6 +69,14 @@ define([
       var self = this;
       var questionTitle = $(".question-title").val();
       var questionDescription = $(".question-description").val();
+
+      if (!Utils.validateFormFields([{
+        'question-title-form-group': 'question-title'
+      }, {
+        'question-description-form-group': 'question-description'
+      }])) {
+        return;
+      }
 
       if (questionTitle === "" || questionDescription === "") {
         alert("Please fill out the form to post a question!");

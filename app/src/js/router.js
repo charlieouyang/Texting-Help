@@ -14,8 +14,9 @@ define([
   'views/question/QuestionsListView',
   'views/question/QuestionView',
   'views/question/QuestionCreateEditView',
+  'views/answer/AnswerEditView',
 ], function($, _, Backbone, Utils, Session, HeaderView, HomeView, FooterView, LoginView,
-  UserView, error404View, QuestionsListView, QuestionView, CreateEditQuestionView) {
+  UserView, error404View, QuestionsListView, QuestionView, CreateEditQuestionView, AnswerEditView) {
   
   var AppRouter = Backbone.Router.extend({
     routes: {
@@ -46,6 +47,9 @@ define([
 
       "question/:question_id/edit": "createEditQuestionPage",
       "question/:question_id/edit/": "createEditQuestionPage",
+
+      "answer/:answer_id/edit": "editAnswerPage",
+      "answer/:answer_id/edit/": "editAnswerPage",
 
       "questions": "questionsPage",
       "questions/": "questionsPage",
@@ -132,6 +136,15 @@ define([
         });
 
         appView.showView(questionCreateEditView);
+    });
+
+    app_router.on('route:editAnswerPage', function (id) {
+        var answerEditView = new AnswerEditView({
+          session: sessionModel,
+          answerId: id
+        });
+
+        appView.showView(answerEditView);
     });
 
     app_router.on('route:undefinedRoutes', function (actions) {

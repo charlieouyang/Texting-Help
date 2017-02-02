@@ -36,16 +36,22 @@ DONE
 DONE
 9) Error handling for search... When no questions come back
 
+DONE
 10) Edit of questions
 
+DONE
 11) Edit of answers
 
+DONE
 12) Handle empty comments, answers, and posts
 
-14) Add a last updated time
+DONE
+14) Add a last updated time if created time and updated time aren't equal
 
 DONE
 13) FB log in log out set round edges
 
 14) Error handling... Replace all alerts with error page or modal or something...
   a) 
+
+15) Notification system

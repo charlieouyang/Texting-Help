@@ -17,13 +17,23 @@ module.exports = function (router) {
         ]
     });
 
-    //Get all answers
+    //Get answers that belong to 1 post
     router.get('/answer', function(req, res) {
-        Answer.findAll().then(function(answers) {
+        var queryParams = req.query;
+        var postFindingOptions = {};
+
+        if (queryParams.post_id) {
+            if (!postFindingOptions.where) {
+                postFindingOptions.where = {};
+            }
+            postFindingOptions.where.PostId = queryParams.post_id;
+        }
+
+        Answer.findAll(postFindingOptions).then(function(answers) {
             var dict = {};
 
             if (answers.length < 1) {
-                dict.message ='Answers not found!';
+                dict.message ='Cannot find answers for this post!';
                 dict.answers_found = answers.length;
                 res.statusCode = 404;
                 res.json(dict);
@@ -45,10 +55,10 @@ module.exports = function (router) {
     });
 
     //Get answers that belong to 1 post
-    router.get('/answer/:post_id', function(req, res) {
+    router.get('/answer/:answer_id', function(req, res) {
         Answer.findAll({
             where: {
-                PostId: req.params.post_id
+                id: req.params.answer_id
             }
         }).then(function(answers) {
             var dict = {};
@@ -59,10 +69,9 @@ module.exports = function (router) {
                 res.statusCode = 404;
                 res.json(dict);
             } else {
-                dict.message ='Answers found!';
-                dict.answers_found = answers.length;
+                dict.message ='Answer found!';
                 res.statusCode = 200;
-                dict.answers = answers;
+                dict.answer = answers[0];
                 res.json(dict);
             }
         }).catch(function(error) {
@@ -132,6 +141,56 @@ module.exports = function (router) {
             res.statusCode = 422;
             var dict = {message: 'Validation Failed'};
 
+            dict.error = error;
+            res.json(dict);
+        });
+    });
+
+    router.put('/answer/:answer_id', auth, function(req, res) {
+        var data = req.body,
+            acceptedField = {
+                'description': 'description'
+            },
+            valid = {};
+
+        for (var key in acceptedField) {
+            if (acceptedField.hasOwnProperty(key)) {
+                var dataKey = acceptedField[key];
+                valid[key] = data[dataKey];
+            }
+        }
+
+        Answer.findAll({
+            where: {
+                id: req.params.answer_id
+            }
+        }).then(function(answers) {
+            var dict = {};
+            var answer;
+
+            if (answers.length < 1) {
+                dict.message ='Cannot find what you are trying to update!';
+                res.statusCode = 404;
+                res.json(dict);
+            } else {
+                answer = answers[0];
+
+                answer.update(valid).then(function(updatedAnswerObject){
+                    dict.message ='Answer updated!!';
+                    res.statusCode = 200;
+                    dict.answer = updatedAnswerObject;
+                    res.json(dict);
+                }).catch(function(){
+                    dict.message ='Found the answer, but something went wrong during update!!';
+                    res.statusCode = 500;
+                    res.json(dict);
+                });
+            }
+        }).catch(function(error) {
+            var dict = {};
+            res.statusCode = 500;
+
+            dict.message = 'Get answers failed';
             dict.error = error;
             res.json(dict);
         });

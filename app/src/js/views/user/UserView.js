@@ -3,10 +3,11 @@ define([
   'underscore',
   'backbone',
   'Mustache',
+  'Utils',
   'models/UserModel',
   'models/PointModel',
   'text!templates/user/userTemplate.html'
-], function($, _, Backbone, Mustache, UserModel, Point, userTemplate){
+], function($, _, Backbone, Mustache, Utils, UserModel, Point, userTemplate){
 
   var LoginView = Backbone.View.extend({
 
@@ -95,8 +96,15 @@ define([
       var password = $('.user-create-edit-form .password').val();
       var email = $('.user-create-edit-form .email').val();
 
-      if (username === '' || fullname === '' || password === '' || email === '') {
-        alert('Please enter all fields in this form to create user!');
+      if (!Utils.validateFormFields([{
+        'full-name-form-group': 'fullname'
+      }, {
+        'username-form-group': 'username'
+      }, {
+        'email-form-group': 'email'
+      }, {
+        'password-form-group': 'password'
+      }])) {
         return;
       }
 
@@ -122,8 +130,11 @@ define([
       var fullname = $('.user-create-edit-form .fullname').val();
       var email = $('.user-create-edit-form .email').val();
 
-      if (fullname === '' || email === '') {
-        alert('Please enter all fields in this form to create user!');
+      if (!Utils.validateFormFields([{
+        'full-name-form-group': 'fullname'
+      }, {
+        'email-form-group': 'email'
+      }])) {
         return;
       }
 

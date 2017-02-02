@@ -43,7 +43,7 @@
                 </div>
                 <div class="row">
                 {{#User}}
-                    <small class="text-muted time-difference-text">{{name}} asked {{createdTimeDifference}}</small>
+                    <small class="text-muted time-difference-text">{{name}} {{#createdTimeDifference}}asked {{createdTimeDifference}}{{/createdTimeDifference}}{{^createdTimeDifference}}updated {{updatedTimeDifference}}{{/createdTimeDifference}}</small>
                 {{/User}}
                 </div>
             </a>
