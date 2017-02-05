@@ -97,7 +97,7 @@ define([
       var email = $('.user-create-edit-form .email').val();
 
       if (!Utils.validateFormFields([{
-        'full-name-form-group': 'fullname'
+        'fullname-form-group': 'fullname'
       }, {
         'username-form-group': 'username'
       }, {
@@ -112,15 +112,16 @@ define([
         username: username,
         password: password, 
         name: fullname,
-        email: email
+        email: email,
+        type: 'email'
       }, {
         success: function(userModel) {
           //hard refresh of the page to get logged out state
-          alert('User created!');
-          Backbone.history.navigate('#user/' + userModel.get('username'), true);
+          $.notify({message: 'User created! Please log in'},{type: 'success'});
+          Backbone.history.navigate('#user/' + userModel.get('id'), true);
         },
-        error: function(error) {
-          alert('User creation failed... Maybe username is already taken.');
+        error: function(userModel, error) {
+          Utils.errorHandlingFromApi(userModel, error, 'User creation error!');
         }
       });
     },
@@ -144,11 +145,11 @@ define([
       }, {
         success: function(userModel) {
           //hard refresh of the page to get logged out state
-          alert('User updated!');
+          $.notify({message: 'User updated!'},{type: 'success'});
           Backbone.history.navigate('#questions', true);
         },
-        error: function(error) {
-          alert('User creation failed... Maybe username is already taken.');
+        error: function(userModel, error) {
+          Utils.errorHandlingFromApi(userModel, error, 'User update error!', self.sessionModel);
         }
       });
     }

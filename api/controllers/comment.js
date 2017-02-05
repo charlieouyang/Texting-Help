@@ -5,6 +5,7 @@ module.exports = function (router) {
         auth = require('../middleware/authentication'),
         Comment = db.Comment,
         Point = db.Point,
+        Notification = db.Notification,
         availableFields = {
             'description': 'description'
         },
@@ -117,8 +118,34 @@ module.exports = function (router) {
                 pointDictForAnswer.fromUserId = valid.UserId;
 
                 Point.create(pointDictForAnswer).then(function(answerPoint){
-                    dict.message = 'Comment created, point created for original post, and point created for comment!'
-                    res.json(dict);
+                    var notificationDict = {};
+
+                    //Because valid.UserId might be int and post_or_... might be string
+                    if (valid.UserId != valid.post_or_answer_owner_user) {
+                        notificationDict.fromUserId = valid.UserId;
+                        notificationDict.notificationOn = valid.commentOn;
+                        notificationDict.notificationOnId = valid.commentOnId;
+
+                        if (valid.commentOn === 'post') {
+                            notificationDict.notificationAction = 'comment_on_post';
+                        } else if (valid.commentOn === 'answer') {
+                            notificationDict.notificationAction = 'comment_on_answer';
+                        }
+
+                        notificationDict.readStatus = 'unread';
+                        notificationDict.UserId = valid.post_or_answer_owner_user;
+
+                        Notification.create(notificationDict).then(function(notificationModel){
+                            dict.message = 'Comment created, point created for original post, point created for answer and notification created!'
+                            res.json(dict);
+                        }).catch(function(error){
+                            dict.message = 'Comment created, point created for original post, and point created for answer, but notification creation failed!'
+                            res.json(dict);
+                        });
+                    } else {
+                        dict.message = 'Comment created, point created for original post, and point created for comment but notification not created because fromUser is same as answer or post owner!'
+                        res.json(dict);
+                    }
                 }).catch(function(error){
                     dict.message = 'Comment created and point created for original post owner user but creating point for commenter failed!'
                     res.json(dict);

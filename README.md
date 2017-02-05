@@ -51,7 +51,18 @@ DONE
 DONE
 13) FB log in log out set round edges
 
+DONE
 14) Error handling... Replace all alerts with error page or modal or something...
-  a) 
+  a) User creation and update
+  b) Ask question
+  c) When user token is stale... Log out
 
+DONE
 15) Notification system
+
+DONE
+16) Growler messages (http://bootstrap-notify.remabledesigns.com/) (http://goodybag.github.io/bootstrap-notify/)
+
+17) Truncate length of description and title in quesions page
+
+18) Reroute home page to questions page

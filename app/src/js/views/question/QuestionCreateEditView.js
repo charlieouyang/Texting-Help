@@ -41,7 +41,7 @@ define([
                 self.postQuestionClick(e);
               });
             } else {
-              alert('You are not allowed to edit this! You must be the creater of this question or answer to edit it...');
+              $.notify({message: 'You are not allowed to edit this! You must be the creater of this question or answer to edit it...'},{type: 'warning'});
             }
           },
           error: function() {
@@ -56,7 +56,8 @@ define([
         opts.finished();
 
         if (self.userSession.get('authenticated') !== 'true') {
-          alert('Please log in to create post a question!');
+          $.notify({message: 'Please log in to post a question!'},{type: 'warning'});
+          Backbone.history.navigate('#questions/', true);
         }
 
         $(".post-question").on("click", function(e){
@@ -78,23 +79,20 @@ define([
         return;
       }
 
-      if (questionTitle === "" || questionDescription === "") {
-        alert("Please fill out the form to post a question!");
-      } else {
-        this.question.save({
-          title: questionTitle,
-          description: questionDescription, 
-          tags: ''
-        }, {
-          success: function(questionModel) {
-            //hard refresh of the page to get logged out state
-            Backbone.history.navigate('#question/' + questionModel.get('id'), true);
-          },
-          error: function(error) {
-            alert('Please log in to create post a question!');
-          }
-        });
-      }
+      this.question.save({
+        title: questionTitle,
+        description: questionDescription, 
+        tags: ''
+      }, {
+        success: function(questionModel) {
+          //hard refresh of the page to get logged out state
+          $.notify({message: 'Question created!'},{type: 'success'});
+          Backbone.history.navigate('#question/' + questionModel.get('id'), true);
+        },
+        error: function(model, error) {
+          Utils.errorHandlingFromApi(model, error, 'Question creation error!', self.userSession);
+        }
+      });
     }
 
   });

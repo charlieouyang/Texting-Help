@@ -347,6 +347,7 @@ module.exports = function (router) {
                 }
             }
 
+            dict.id = post.id;
             pointDict.pointOn = 'post';
             pointDict.pointOnId = post.id;
             pointDict.pointValue = 10;

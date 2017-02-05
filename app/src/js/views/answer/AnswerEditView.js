@@ -47,17 +47,20 @@ define([
                 });
               },
               error: function () {
-                alert('post does not exist!');
+                $.notify({message: 'Post does not exist!'},{type: 'warning'});
+                Backbone.history.navigate('#questions', true);
                 opts.finished();
               }
             });
           } else {
-            alert('You are not allowed to edit this answer!');
+            $.notify({message: 'You are not allowed to edit this answer!'},{type: 'warning'});
+            Backbone.history.navigate('#questions', true);
             opts.finished();
           }
         },
         error: function() {
-          alert('answer does not exist!');
+          $.notify({message: 'Answer does not exist!'},{type: 'warning'});
+          Backbone.history.navigate('#questions', true);
           opts.finished();
         }
       });
@@ -73,21 +76,18 @@ define([
         return;
       }
 
-      if (answerDescription === "") {
-        alert("Please fill out the answer to update it!");
-      } else {
-        this.answer.save({
-          description: answerDescription
-        }, {
-          success: function(questionModel) {
-            //hard refresh of the page to get logged out state
-            Backbone.history.navigate('#question/' + self.question.get('post').id, true);
-          },
-          error: function(error) {
-            alert('Please log in to update this answer!');
-          }
-        });
-      }
+      this.answer.save({
+        description: answerDescription
+      }, {
+        success: function(questionModel) {
+          //hard refresh of the page to get logged out state
+          $.notify({message: 'Answer updated!'},{type: 'success'});
+          Backbone.history.navigate('#question/' + self.question.get('post').id, true);
+        },
+        error: function(model, error) {
+          Utils.errorHandlingFromApi(model, error, 'Answer update error!', self.userSession);
+        }
+      });
     }
 
   });

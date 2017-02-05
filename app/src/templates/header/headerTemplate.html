@@ -17,6 +17,7 @@
             <div class="user-login-header">
                 {{#authenticated}}
                     {{#user}}
+                    <span class="badge badge-pill badge-primary notifications-badge" style="display:none;"><span class="notifications-value"></span> <span class="glyphicon glyphicon-star notification-icon" aria-hidden="true"></span></span>
                     <span><a href="#user/{{id}}">{{username}}</a></span>
                     {{/user}}
                     <br>
@@ -27,6 +28,14 @@
                     <a href="#user/create">New user</a>
                 {{/authenticated}}
             </div>
+            {{/userTypeIsFacebook}}
+
+            {{#userTypeIsFacebook}}
+                {{#authenticated}}
+                <div class="notifications-container-fb">
+                    <span class="badge badge-pill badge-primary notifications-badge fb-notifications-container" style="display:none;"><span class="notifications-value"></span> <span class="glyphicon glyphicon-star notification-icon" aria-hidden="true"></span></span>
+                </div>
+                {{/authenticated}}
             {{/userTypeIsFacebook}}
         </div>
     </div>

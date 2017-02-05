@@ -104,7 +104,11 @@ define([
         }
         vote = new Vote();
         voteSaveObject.voteValue = '1';
-        vote.save(voteSaveObject);
+        vote.save(voteSaveObject,{
+          error: function(model, error) {
+            Utils.errorHandlingFromApi(model, error, 'Voting error!', self.userSession);
+          }
+        });
         upVoteCountValue++;
       } else if (element.hasClass('vote-up-on')) {
         //Replace with class vote-up-off
@@ -115,6 +119,10 @@ define([
         vote.destroy({
           data: voteSaveObject,
           processData: true
+        },{
+          error: function(model, error) {
+            Utils.errorHandlingFromApi(model, error, 'Voting error!', self.userSession);
+          }
         });
         upVoteCountValue--;
       } else if (element.hasClass('vote-down-off')) { 
@@ -128,17 +136,25 @@ define([
         }
         vote = new Vote();
         voteSaveObject.voteValue = '-1';
-        vote.save(voteSaveObject);
+        vote.save(voteSaveObject,{
+          error: function(model, error) {
+            Utils.errorHandlingFromApi(model, error, 'Voting error!', self.userSession);
+          }
+        });
         upVoteCountValue--;
       } else if (element.hasClass('vote-down-on')) {
         //Replace with class vote-down-off
         //Delete Vote model
-        element.removeClass('vote-down-on').addClass('vote-down-off');
+        element.removeClass('vote-down-on').addClass('vote-down-off', self.userSession);
         voteSaveObject.id = 1;
         vote = new Vote(voteSaveObject);
         vote.destroy({
           data: voteSaveObject,
           processData: true
+        },{
+          error: function(model, error) {
+            Utils.errorHandlingFromApi(model, error, 'Voting error!', self.userSession);
+          }
         });
         upVoteCountValue++;
       }
@@ -187,11 +203,14 @@ define([
           success: function() {
             Utils.hidePageLoadingModal();
             //hard refresh of the page to get logged out state
-            window.location.reload();
+            $.notify({message: 'Comment added!'},{type: 'success'});
+            setTimeout(function(){
+              window.location.reload();
+            }, 1000);
           },
-          error: function() {
+          error: function(model, error) {
             Utils.hidePageLoadingModal();
-            alert('Posting failed... Maybe user token is stale? Please logout and login again.');
+            Utils.errorHandlingFromApi(model, error, 'Adding comment error!', self.userSession);
           }
         });
 
@@ -225,11 +244,14 @@ define([
         success: function() {
           //hard refresh of the page to get logged out state
           Utils.hidePageLoadingModal();
-          window.location.reload();
+          $.notify({message: 'Answer added!'},{type: 'success'});
+          setTimeout(function(){
+            window.location.reload();
+          }, 1000);
         },
-        error: function() {
+        error: function(model, error) {
           Utils.hidePageLoadingModal();
-          alert('Posting failed... Maybe user token is stale? Please logout and login again.');
+          Utils.errorHandlingFromApi(model, error, 'Adding answer error!', self.userSession);
         }
       });
     },

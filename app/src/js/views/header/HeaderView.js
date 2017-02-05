@@ -4,8 +4,11 @@ define([
   'backbone',
   'Mustache',
   'models/UserModel',
-  'text!templates/header/headerTemplate.html'
-], function($, _, Backbone, Mustache, User, headerTemplate){
+  'models/NotificationModel',
+  'collections/NotificationsCollection',
+  'text!templates/header/headerTemplate.html',
+  'text!templates/header/notificationTemplate.html'
+], function($, _, Backbone, Mustache, User, NotificationRead, Notifications, headerTemplate, notificationTemplate){
 
   var HeaderView = Backbone.View.extend({
     el: $("#header"),
@@ -23,6 +26,10 @@ define([
       var rendered;
       var result = {};
       var user;
+      var notificationsRendered;
+      var notificationContainer;
+      var notificationCollectionRead;
+      var popover;
 
       result.authenticated = this.sessionModel.get('authenticated');
 
@@ -91,10 +98,82 @@ define([
       rendered = Mustache.to_html(headerTemplate, result);
       this.$el.html(rendered);
 
-      // if (result.user && result.user.type === 'facebook') {
-      //   $(".fb-user-container").show();
-      //   $(".fb-user-profile-picture").show();
-      // }
+      if (result.authenticated === 'true') {
+        this.notifications = new Notifications();
+        this.notifications.fetch({
+          success: function(notifications) {
+            //Get how many unread noficiations...
+            //Set the span to how many unread
+            //Set the notifications-unread or notifications-read class
+            //Set content of the popover
+            //Add event handler
+            $(".notifications-value").text(notifications.numberOfUnreadNotifications);
+            if (notifications.numberOfUnreadNotifications > 0) {
+              $(".notifications-badge").removeClass('notifications-read').addClass('notifications-unread');
+            } else {
+              $(".notifications-badge").removeClass('notifications-unread').addClass('notifications-read');
+            }
+
+            $(".notifications-badge").show();
+            $(".notifications-badge").on('click', function(e){
+
+              notificationContainer = {};
+              notificationContainer.notifications = notifications.toJSON();
+              notificationsRendered = Mustache.to_html(notificationTemplate, notificationContainer);
+
+              $(".notifications-badge").popover({
+                title: 'Notifications',
+                trigger: 'focus',
+                placement: "bottom",
+                template: '<div class="popover" role="tooltip">' + 
+                  '<div class="popover-arrow"></div>' + 
+                  '<div class="notification-header"><h3 class="popover-title"></h3><span class="glyphicon glyphicon-check mark-notifications-read" aria-hidden="true"></div>' + 
+                  '<div class="popover-content"></div>' + 
+                  '</div>',
+                html: true
+              });
+
+              popover = $('.notifications-badge').data('bs.popover');
+              popover.options.content = notificationsRendered;
+              $(".notifications-badge").popover("show");
+
+              $(".mark-notifications-read").on('click', function(e) {
+                notificationCollectionRead = new NotificationRead();
+                notificationCollectionRead.save({}, {
+                  success: function(notificationReadResult) {
+                    $(".notification-description-a").removeClass('unread').addClass('read');
+                    $(".notifications-badge").removeClass("notifications-unread").addClass("notifications-read");
+                    $(".notifications-value").text("0");
+
+                    notifications.forEach(function(model) {
+                      model.set({'readStatus': 'read', 'unread': false});
+                    });
+                  },
+                  error: function(error) {
+                    console.log("something went wrong here :( in marking notifications read");
+                  }
+                });
+              });
+            });
+
+            $('body').on('click', function (e) {
+              //did not click a popover toggle or popover
+              if (!$(e.target).hasClass('notifications-badge')
+                && !$(e.target).hasClass('notification-icon')
+                && !$(e.target).hasClass('notifications-value')
+                && $(e.target).parents('.popover').length === 0) { 
+                $('.notifications-badge').popover('hide');
+              }
+
+              if ($(e.target).hasClass('notification-description-a') || 
+                $(e.target).hasClass('notification-description-p') || 
+                $(e.target).hasClass('notification-row') ) {
+                $('.notifications-badge').popover('hide');
+              }
+            });
+          }
+        });
+      }
     },
 
     logoutButtonClick: function(e) {

@@ -5,6 +5,7 @@ module.exports = function (router) {
         auth = require('../middleware/authentication'),
         Vote = db.Vote,
         Point = db.Point,
+        Notification = db.Notification,
         availableFields = {
             'voteValue': 'voteValue'
         },
@@ -138,8 +139,34 @@ module.exports = function (router) {
                         pointData.pointOnId = valid.voteOnId;
                         
                         Point.create(pointData).then(function(point){
-                            dict.message = 'Vote created and point assigned';
-                            res.json(dict);
+                            var notificationDict = {};
+
+                            //Because valid.UserId might be int and post_or_... might be string
+                            if (valid.UserId != valid.post_or_answer_owner_user) {
+                                notificationDict.fromUserId = valid.UserId;
+                                notificationDict.notificationOn = valid.voteOn;
+                                notificationDict.notificationOnId = valid.voteOnId;
+
+                                if (valid.voteOn === 'post') {
+                                    notificationDict.notificationAction = 'upvote_on_post';
+                                } else if (valid.voteOn === 'answer') {
+                                    notificationDict.notificationAction = 'upvote_on_answer';
+                                }
+
+                                notificationDict.readStatus = 'unread';
+                                notificationDict.UserId = valid.post_or_answer_owner_user;
+
+                                Notification.create(notificationDict).then(function(notificationModel){
+                                    dict.message = 'Vote created and point assigned and notification created!'
+                                    res.json(dict);
+                                }).catch(function(error){
+                                    dict.message = 'Vote created and point assigned, but notification creation failed!'
+                                    res.json(dict);
+                                });
+                            } else {
+                                dict.message = 'Vote created and point assigned but notification not created because fromUser is same as answer or post owner!'
+                                res.json(dict);
+                            }
                         });
                     } else {
                         dict.message = 'Vote created and but point is not assigned';

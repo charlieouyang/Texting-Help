@@ -220,7 +220,8 @@ module.exports = function (router) {
                 'username': 'username',
                 'password': 'password',
                 'name': 'name',
-                'email': 'email'
+                'email': 'email',
+                'type': 'type'
             },
             valid = {};
 
@@ -243,6 +244,7 @@ module.exports = function (router) {
                     dict[availableFields[key]] = user[key];
                 }
             }
+            dict.id = user.id;
             res.json(dict);
         }).catch(function(error) {
             res.statusCode = 422;

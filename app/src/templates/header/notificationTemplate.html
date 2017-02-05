@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="list-group notifications-list">
+        {{#notifications}}
+        <a href="{{linkUrl}}" class="list-group-item list-group-item-action flex-column align-items-start {{#unread}}unread{{/unread}}{{^unread}}read{{/unread}} notification-description-a">
+            <div class="row notification-row">
+                <p class="notification-description-p">{{message}}</p>
+            </div>
+        </a>
+        {{/notifications}}
+    </div>
+
+    {{^notifications}}
+    <div class="list-group notifications-list">
+        <a href="#questions/" class="list-group-item list-group-item-action flex-column align-items-start read notification-description-a">
+            <div class="row notification-row">
+                <p class="notification-description-p">No notifications found!</p>
+            </div>
+        </a>
+    </div>
+    {{/notifications}}
+</div>

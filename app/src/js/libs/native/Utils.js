@@ -6,6 +6,29 @@ define([
 
   var Texting = {};
 
+  Texting.errorHandlingFromApi = function(model, error, errorText, session) {
+    var count;
+
+    if (error && error.responseJSON && error.responseJSON.message &&
+      error.responseJSON.message === "Token did not match any users or token has expired") {
+      $.notify({message: 'Your session expired... Please log in again!'},{type: 'warning'});
+      if (session) {
+        session.logout();
+      }
+      return;
+    }
+
+    if (error && error.responseJSON && error.responseJSON.errors) {
+      error.responseJSON.errors.forEach(function(errorObj, index) {
+        count = index + 1;
+        errorText += ' ' + count + ') ' + errorObj.message + ' ';
+      });
+    } 
+
+    $.notify({message: errorText},{type: 'warning'});
+  };
+
+
   Texting.showPageLoadingModal = function(title, description) {
     $("#page-modal").modal('show');
   };
@@ -42,6 +65,10 @@ define([
         $("." + formSelectorStr).addClass('has-error');
       }
     });
+
+    if (!validateSucceeded) {
+      $.notify({message: 'Please fill out the form properly!'},{type: 'warning'});
+    }
 
     return validateSucceeded;
   },

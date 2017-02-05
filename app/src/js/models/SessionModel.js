@@ -113,6 +113,7 @@ define([
       });
       login.fail(function(error) {
         callback(error);
+        $.notify({message: 'Logging in failed!'},{type: 'warning'});
         Backbone.history.navigate('login', {
           trigger: true
         });
