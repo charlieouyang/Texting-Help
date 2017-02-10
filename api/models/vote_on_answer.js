@@ -1,18 +1,10 @@
 module.exports = function(sequelize, DataTypes) {
     'use strict';
 
-    var Vote = sequelize.define('Vote',
+    var Vote_On_Answer = sequelize.define('Vote_On_Answer',
         {
             voteValue: {
                 type: DataTypes.ENUM('1', '-1'),
-                allowNull: false
-            },
-            voteOn: {
-                type: DataTypes.ENUM('post', 'answer'),
-                allowNull: false
-            },
-            voteOnId: {
-                type: DataTypes.INTEGER,
                 allowNull: false
             },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
@@ -20,10 +12,11 @@ module.exports = function(sequelize, DataTypes) {
         {
             classMethods: {
                 associate: function(models) {
-                    Vote.belongsTo(models.User);
+                    Vote_On_Answer.belongsTo(models.User);
+                    Vote_On_Answer.belongsTo(models.Answer);
                 }
             }
         });
 
-    return Vote;
+    return Vote_On_Answer;
 };

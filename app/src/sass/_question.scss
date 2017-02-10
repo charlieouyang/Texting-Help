@@ -2,6 +2,10 @@
   padding: 20px;
 }
 
+.date-range-filter {
+  top: 8px;
+}
+
 .vote {
   padding: 0px;
 
@@ -73,12 +77,19 @@
   .question-list-title {
     font-size: 20px;
     font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .question-description {
     font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
     padding: 0px 15px 0px 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-right: 200px;
   }
 
   .badge-success {

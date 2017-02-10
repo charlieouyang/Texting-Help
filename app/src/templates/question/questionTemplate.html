@@ -7,11 +7,9 @@
         <div class="jumbotron">
             <div class="row">
                 <div class="vote row col-md-1" vote-type="post" vote-type-id="{{id}}" post-answer-owner-user-id={{#User}}{{id}}{{/User}}>
-                {{#vote}}
                     <a class="vote-up {{#userVotedUpForPost}}vote-up-on{{/userVotedUpForPost}}{{^userVotedUpForPost}}vote-up-off{{/userVotedUpForPost}}"></a>
-                    <span class="upvote-count">{{net_up_votes}}</span>
+                    <span class="upvote-count">{{upVoteTotal}}</span>
                     <a class="vote-down {{#userVotedDownForPost}}vote-down-on{{/userVotedDownForPost}}{{^userVotedDownForPost}}vote-down-off{{/userVotedDownForPost}}"></a>
-                {{/vote}}
                 </div>
                 <div class="row col-md-11">
                     <p class="question-description">{{description}}</p>
@@ -53,11 +51,9 @@
             <div class="jumbotron">
                 <div class="row">
                     <div class="vote row col-md-1" vote-type="answer" vote-type-id="{{id}}" post-answer-owner-user-id={{#User}}{{id}}{{/User}}>
-                    {{#vote}}
                         <a class="vote-up {{#userVotedUpForPost}}vote-up-on{{/userVotedUpForPost}}{{^userVotedUpForPost}}vote-up-off{{/userVotedUpForPost}}"></a>
-                        <span class="upvote-count">{{net_up_votes}}</span>
+                        <span class="upvote-count">{{upVoteTotal}}</span>
                         <a class="vote-down {{#userVotedDownForPost}}vote-down-on{{/userVotedDownForPost}}{{^userVotedDownForPost}}vote-down-off{{/userVotedDownForPost}}"></a>
-                    {{/vote}}
                     </div>
                     <div class="row col-md-11">
                         <p class="question-description">{{description}}</p>

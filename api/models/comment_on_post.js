@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
     'use strict';
 
-    var Answer = sequelize.define('Answer',
+    var Comment_On_Post = sequelize.define('Comment_On_Post',
         {
             description: {
                 type: DataTypes.TEXT,
@@ -12,14 +12,11 @@ module.exports = function(sequelize, DataTypes) {
         {
             classMethods: {
                 associate: function(models) {
-                    Answer.belongsTo(models.Post);
-                    Answer.belongsTo(models.User);
-                    Answer.hasMany(models.Comment_On_Answer);
-                    Answer.hasMany(models.Vote_On_Answer);
-                    Answer.hasMany(models.Point_On_Answer);
+                    Comment_On_Post.belongsTo(models.User);
+                    Comment_On_Post.belongsTo(models.Post);
                 }
             }
         });
 
-    return Answer;
+    return Comment_On_Post;
 };

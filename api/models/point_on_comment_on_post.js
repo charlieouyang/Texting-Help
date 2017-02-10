@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
     'use strict';
 
-    var Point = sequelize.define('Point',
+    var Point_On_Comment_On_Post = sequelize.define('Point_On_Comment_On_Post',
         {
             fromUserId: {
                 type: DataTypes.INTEGER,
@@ -11,25 +11,18 @@ module.exports = function(sequelize, DataTypes) {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
-            pointOn: {
-                type: DataTypes.ENUM('post', 'answer', 'comment'),
-                allowNull: false
-            },
-            pointOnId: {
-                type: DataTypes.INTEGER,
-                allowNull: false
-            },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         },
         {
             classMethods: {
                 associate: function(models) {
-                    Point.belongsTo(models.User);
+                    Point_On_Comment_On_Post.belongsTo(models.User);
+                    Point_On_Comment_On_Post.belongsTo(models.Comment_On_Post);
                 }
             }
         });
 
-    return Point;
+    return Point_On_Comment_On_Post;
 };
 
 /*

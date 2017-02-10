@@ -158,8 +158,8 @@ define([
         if (!dataObject.upVoteTotal) {
           dataObject.upVoteTotal = 0;
         }
-        if (dataObject.Comments) {
-          dataObject.numberOfComments = dataObject.Comments.length;
+        if (dataObject.Comment_On_Posts) {
+          dataObject.numberOfComments = dataObject.Comment_On_Posts.length;
         } else {
           dataObject.numberOfComments = 0;
         }

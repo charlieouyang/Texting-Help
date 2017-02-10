@@ -8,6 +8,18 @@
                     <input type="checkbox">Only My Questions</input>
                 </label>
             </div>
+            <div class="btn-group date-range-filter">
+                <label>Filter results: </label>
+                <div class="form-group">
+                    <select class="form-control">
+                        <option value='today'>Today</option>
+                        <option value='this_week'>This Week</option>
+                        <option value='this_month'>This Month</option>
+                        <option value='all_time'>All Time</option>
+                    </select>
+                </div>
+            </div>
+
             {{/userLoggedIn}}
             <br>
         </div>

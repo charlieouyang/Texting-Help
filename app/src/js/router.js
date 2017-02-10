@@ -21,7 +21,7 @@ define([
   var AppRouter = Backbone.Router.extend({
     routes: {
       //Landing Page
-      "": "homePage",
+      "": "questionsPage",
 
       "login": "loginPage",
       "login/": "loginPage",

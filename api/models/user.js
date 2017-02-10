@@ -115,8 +115,15 @@ module.exports = function(sequelize, DataTypes) {
             classMethods: {
                 associate: function(models) {
                     User.hasMany(models.Post);
-                    User.hasMany(models.Comment);
                     User.hasMany(models.Answer);
+                    User.hasMany(models.Comment_On_Post);
+                    User.hasMany(models.Comment_On_Answer);
+                    User.hasMany(models.Vote_On_Post);
+                    User.hasMany(models.Vote_On_Answer);
+                    User.hasMany(models.Point_On_Answer);
+                    User.hasMany(models.Point_On_Post);
+                    User.hasMany(models.Point_On_Comment_On_Post);
+                    User.hasMany(models.Point_On_Comment_On_Answer);
                 }
             }
         });

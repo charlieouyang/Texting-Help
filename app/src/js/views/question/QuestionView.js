@@ -32,38 +32,23 @@ define([
 
       this.question.fetch({
         success: function() {
-          self.votes.push(new Vote({
-            post_id: self.question.id
-          }));
+          result = self.cleanseData(self.question.toJSON(), self.votes);
+          rendered = Mustache.to_html(questionTemplate, result);
+          self.el = rendered;
+          opts.finished();
 
-          self.question.get('post').Answers.forEach(function(answerModel){
-            self.votes.push(new Vote({
-              answer_id: answerModel.id
-            }));
+          Utils.hidePageLoadingModal();
+
+          $(".add-a-comment").on('click', function(e){
+            self.addACommentClick(e);
           });
 
-          votesCompleted = _.invoke(self.votes, 'fetch');
-          //when all of them are complete...
-          $.when.apply($, votesCompleted).done(function() {
-            //all ready and good to go...
-            result = self.cleanseData(self.question.toJSON(), self.votes);
-            rendered = Mustache.to_html(questionTemplate, result);
-            self.el = rendered;
-            opts.finished();
+          $(".answer-submit").on('click', function(e){
+            self.addAnswerClick(e);
+          });
 
-            Utils.hidePageLoadingModal();
-
-            $(".add-a-comment").on('click', function(e){
-              self.addACommentClick(e);
-            });
-
-            $(".answer-submit").on('click', function(e){
-              self.addAnswerClick(e);
-            });
-
-            $(".vote-up-off, .vote-down-off, .vote-up-on, .vote-down-on").on('click', function(e){
-              self.toggleVoteUpOrDown(e);
-            });
+          $(".vote-up-off, .vote-down-off, .vote-up-on, .vote-down-on").on('click', function(e){
+            self.toggleVoteUpOrDown(e);
           });
         },
         error: function() {
@@ -256,35 +241,11 @@ define([
       });
     },
 
-    cleanseData: function(data, votes) {
+    cleanseData: function(data) {
       var self = this;
       var differenceInMilliseconds;
       var postComments;
       var answerComments;
-      var votesToPostDictionary = {};
-      var votesToAnswerDictionary = {};
-      var netUpVotes;
-
-      votes.forEach(function(voteModel){
-        netUpVotes = 0;
-        if (voteModel.get('post_id')) {
-          if (voteModel.get('number_of_upvotes') - voteModel.get('number_of_downvotes')) {
-            netUpVotes = voteModel.get('number_of_upvotes') - voteModel.get('number_of_downvotes');
-          }
-          voteModel.set({
-            net_up_votes: netUpVotes
-          });
-          votesToPostDictionary[voteModel.get('post_id')] = voteModel.toJSON();
-        } else if (voteModel.get('answer_id')) {
-          if (voteModel.get('number_of_upvotes') - voteModel.get('number_of_downvotes')) {
-            netUpVotes = voteModel.get('number_of_upvotes') - voteModel.get('number_of_downvotes');
-          }
-          voteModel.set({
-            net_up_votes: netUpVotes
-          });
-          votesToAnswerDictionary[voteModel.get('answer_id')] = voteModel.toJSON();
-        }
-      });
 
       //Get the post... Set the time
       differenceInMilliseconds = Date.now() - Date.parse(data.post.createdAt);
@@ -296,8 +257,7 @@ define([
         data.post.updatedTimeDifference = false;
       }
       
-      data.post.vote = votesToPostDictionary[data.post.id];
-      self.checkUserVotedForPostOrAnswer(data.post, data.post.vote.votes);
+      self.checkUserVotedForPostOrAnswer(data.post);
 
       //can this current user edit this post?
       if (self.userSession && self.userSession.get('user') && self.userSession.get('user').id === data.post.User.id) {
@@ -308,8 +268,8 @@ define([
       }
 
       //Get the comments... Set the time
-      postComments = data.post.Comments;
-      delete data.post.Comments;
+      postComments = data.post.Comment_On_Posts;
+      delete data.post.Comment_On_Posts;
       data.post.numberOfComments = postComments.length;
       postComments.forEach(function(dataObject){
         differenceInMilliseconds = Date.now() - Date.parse(dataObject.createdAt);
@@ -329,8 +289,7 @@ define([
           dataObject.updatedTimeDifference = false;
         }
 
-        dataObject.vote = votesToAnswerDictionary[dataObject.id];
-        self.checkUserVotedForPostOrAnswer(dataObject, dataObject.vote.votes);
+        self.checkUserVotedForPostOrAnswer(dataObject);
 
         //can this current user edit this answer?
         if (self.userSession && self.userSession.get('user') && self.userSession.get('user').id === dataObject.User.id) {
@@ -340,9 +299,9 @@ define([
           dataObject.canEditAnswer = false;
         }
 
-        if (dataObject.Comments) {
-          answerComments = dataObject.Comments;
-          delete dataObject.Comments;
+        if (dataObject.Comment_On_Answers) {
+          answerComments = dataObject.Comment_On_Answers;
+          delete dataObject.Comment_On_Answers;
           //Get the comments of the answer... Set the time
           dataObject.numberOfComments = answerComments.length;
           answerComments.forEach(function(commentObjectOfAnswer){
@@ -356,23 +315,41 @@ define([
       return data;
     },
 
-    checkUserVotedForPostOrAnswer: function(postOrAnswer, votes) {
+    checkUserVotedForPostOrAnswer: function(postOrAnswer) {
       var self = this;
       var user = this.userSession.get('user');
       var userNotFound = true;
 
-      if (user && votes) {
-        votes.forEach(function(voteModel){
-          if (voteModel.UserId === user.id) {
+      if (!user) {
+        return;
+      }
+
+      if (postOrAnswer.Answers) {
+        //This is a post... Just look at the post votes
+        postOrAnswer.Vote_On_Posts.forEach(function(voteOnPostObj){
+          if (voteOnPostObj.UserId === user.id) {
             userNotFound = false;
-            if (voteModel.voteValue === '1') {
+            if (voteOnPostObj.voteValue === '1') {
               postOrAnswer.userVotedUpForPost = true;
               postOrAnswer.userVotedDownForPost = false;
-            } else if (voteModel.voteValue === '-1') {
+            } else if (voteOnPostObj.voteValue === '-1') {
               postOrAnswer.userVotedDownForPost = true;
               postOrAnswer.userVotedUpForPost = false;
             }
-          }
+          } 
+        });
+      } else {
+        postOrAnswer.Vote_On_Answers.forEach(function(voteOnAnswerObj){
+          if (voteOnAnswerObj.UserId === user.id) {
+            userNotFound = false;
+            if (voteOnAnswerObj.voteValue === '1') {
+              postOrAnswer.userVotedUpForPost = true;
+              postOrAnswer.userVotedDownForPost = false;
+            } else if (voteOnAnswerObj.voteValue === '-1') {
+              postOrAnswer.userVotedDownForPost = true;
+              postOrAnswer.userVotedUpForPost = false;
+            }
+          } 
         });
       }
 

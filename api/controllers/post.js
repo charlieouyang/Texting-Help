@@ -6,10 +6,15 @@ module.exports = function (router) {
         fs = require('fs'),
         Post = db.Post,
         Answer = db.Answer,
-        Comment = db.Comment,
+        Comment_On_Answer = db.Comment_On_Answer,
+        Comment_On_Post = db.Comment_On_Post,
         User = db.User,
-        Point = db.Point,
-        Vote = db.Vote,
+        Point_On_Answer = db.Point_On_Answer,
+        Point_On_Post = db.Point_On_Post,
+        Point_On_Comment_On_Answer = db.Point_On_Comment_On_Answer,
+        Point_On_Comment_On_Post = db.Point_On_Comment_On_Post,
+        Vote_On_Answer = db.Vote_On_Answer,
+        Vote_On_Post = db.Vote_On_Post,
         availableFields = {
             'title': 'title',
             'description': 'description',
@@ -59,15 +64,41 @@ module.exports = function (router) {
         postFindingOptions.limit = resultsPerPage;
         postFindingOptions.order = [['updatedAt', 'DESC']];
         postFindingOptions.include = [];
-        postFindingOptions.include.push({
+        postFindingOptions.include = [{
             model: Answer,
-            as: 'Answers'
-        });
-        postFindingOptions.include.push({
+            as: 'Answers',
+            include: [{
+                model: Comment_On_Answer,
+                as: 'Comment_On_Answers',
+                include: [{
+                    model: User,
+                    as: 'User',
+                    attributes: ['username', 'id', 'name', 'type']
+                }]
+            }, {
+                model: Vote_On_Answer,
+                as: 'Vote_On_Answers'
+            }, {
+                model: User,
+                as: 'User',
+                attributes: ['username', 'id', 'name', 'type']
+            }]
+        }, {
+            model: Comment_On_Post,
+            as: 'Comment_On_Posts',
+            include: [{
+                model: User,
+                as: 'User',
+                attributes: ['username', 'id', 'name', 'type']
+            }]
+        }, {
+            model: Vote_On_Post,
+            as: 'Vote_On_Posts'
+        }, {
             model: User,
             as: 'User',
             attributes: ['username', 'id', 'name', 'type']
-        });
+        }];
 
         if (queryParams.asked_by) {
             if (!postFindingOptions.where) {
@@ -97,6 +128,7 @@ module.exports = function (router) {
             var postRows;
             var dict = {};
             var postIds = [];
+            var upVoteTotal;
 
             if (onlyPostMeta) {
                 dict.message ='Posts found!';
@@ -106,105 +138,47 @@ module.exports = function (router) {
                 return;
             }
 
-            postRows = posts.rows;
-            postRows.forEach(function(postObjects){
-                postIds.push(postObjects.id);
-            });
+            if (posts.rows.length) {
+                dict.count = posts.count;
+                dict.posts = posts.rows;
 
-            Comment.findAll({
-                where: {
-                    commentOn: 'post',
-                    commentOnId: {
-                        $or: postIds
-                    }
-                },
-                include: [{
-                    model: User,
-                    as: 'User',
-                    attributes: ['username', 'id', 'name', 'type']
-                }]
-            }).then(function(commentsReturned){
-                var commentOnIdToPostDict = {};
-                commentsReturned.forEach(function(commentObject){
-                    if (commentOnIdToPostDict[commentObject.dataValues.commentOnId]) {
-                        commentOnIdToPostDict[commentObject.dataValues.commentOnId].push(commentObject);
-                    } else {
-                        commentOnIdToPostDict[commentObject.dataValues.commentOnId] = [];
-                        commentOnIdToPostDict[commentObject.dataValues.commentOnId].push(commentObject);
-                    }
-                });
+                //Calculate the net upvotes!
+                dict.posts.forEach(function(postObject){
+                    upVoteTotal = 0;
 
-                Vote.findAll({
-                    where: {
-                        voteOn: 'post',
-                        voteOnId: {
-                            $or: postIds
-                        }
-                    }
-                }).then(function(votesReturned){
-                    var voteOnIdToPostDict = {};
-                    var upvoteTotal;
-                    votesReturned.forEach(function(voteObject){
-                        if (voteOnIdToPostDict[voteObject.dataValues.voteOnId]) {
-                            voteOnIdToPostDict[voteObject.dataValues.voteOnId].push(voteObject);
+                    postObject.Vote_On_Posts.forEach(function(voteOnPostObject){
+                        if (voteOnPostObject.voteValue === '1') {
+                            upVoteTotal++;
                         } else {
-                            voteOnIdToPostDict[voteObject.dataValues.voteOnId] = [];
-                            voteOnIdToPostDict[voteObject.dataValues.voteOnId].push(voteObject);
+                            upVoteTotal--;
                         }
                     });
+                    postObject.dataValues.upVoteTotal = upVoteTotal;
 
-                    //Combine all the upvotes here
-                    for (var key in voteOnIdToPostDict) {
-                        if (voteOnIdToPostDict.hasOwnProperty(key)) {
-                            upvoteTotal = 0;
+                    postObject.Answers.forEach(function(answerObject){
+                        upVoteTotal = 0;
 
-                            voteOnIdToPostDict[key].forEach(function(voteObject){
-                                if (voteObject.dataValues.voteValue === '1') {
-                                    upvoteTotal++;
-                                } else {
-                                    upvoteTotal--;
-                                }
-                            });
-
-                            voteOnIdToPostDict[key] = upvoteTotal;
-                        }
-                    }
-
-                    if (postRows.length < 1) {
-                        dict.message ='Posts not found!';
-                        dict.posts_found = postRows.length;
-                        dict.total_number_of_posts = posts.count;
-                        res.statusCode = 200;
-                        res.json(dict);
-                    } else {
-                        postRows.forEach(function(postObject){
-                            postObject.dataValues.Comments = commentOnIdToPostDict[postObject.id];
-                            postObject.dataValues.upVoteTotal = voteOnIdToPostDict[postObject.id];
+                        answerObject.Vote_On_Answers.forEach(function(voteOnAnswerObject){
+                            if (voteOnAnswerObject.voteValue === '1') {
+                                upVoteTotal++;
+                            } else {
+                                upVoteTotal--;
+                            }
                         });
-                        dict.message ='Posts found!';
-                        dict.posts_found = postRows.length;
-                        dict.total_number_of_posts = posts.count;
-                        res.statusCode = 200;
-                        dict.postRows = postRows;
-                        res.json(dict);
-                    }
-
-                }).catch(function(error) {
-                    var dict = {};
-                    res.statusCode = 500;
-
-                    dict.message = 'Get posts succeeded, get comments succeeded, but get votes failed!';
-                    dict.error = error;
-                    res.json(dict);
+                        answerObject.dataValues.upVoteTotal = upVoteTotal;
+                    });
                 });
-            }).catch(function(error) {
-                var dict = {};
-                res.statusCode = 500;
 
-                dict.message = 'Get posts succeeded, but get comments failed!';
-                dict.error = error;
+                dict.message ='Post found!';
+                res.statusCode = 200;
+
                 res.json(dict);
-            });
+            } else {
+                dict.message ='No posts found!';
+                res.statusCode = 200;
+                res.json(dict);
+            }
+
         }).catch(function(error) {
             var dict = {};
             res.statusCode = 500;
@@ -215,18 +189,40 @@ module.exports = function (router) {
         });
     });
 
-    //Get details of 1 post
+    //Get details of 1 post include:[{all:true}]
     router.get('/post/:post_id', function(req, res) {
         Post.findAll({
             include: [{
                 model: Answer,
                 as: 'Answers',
                 include: [{
+                    model: Comment_On_Answer,
+                    as: 'Comment_On_Answers',
+                    include: [{
+                        model: User,
+                        as: 'User',
+                        attributes: ['username', 'id', 'name', 'type']
+                    }]
+                }, {
+                    model: Vote_On_Answer,
+                    as: 'Vote_On_Answers'
+                }, {
                     model: User,
                     as: 'User',
                     attributes: ['username', 'id', 'name', 'type']
                 }]
-            },{
+            }, {
+                model: Comment_On_Post,
+                as: 'Comment_On_Posts',
+                include: [{
+                    model: User,
+                    as: 'User',
+                    attributes: ['username', 'id', 'name', 'type']
+                }]
+            }, {
+                model: Vote_On_Post,
+                as: 'Vote_On_Posts'
+            }, {
                 model: User,
                 as: 'User',
                 attributes: ['username', 'id', 'name', 'type']
@@ -241,68 +237,41 @@ module.exports = function (router) {
             var post;
             var dict = {};
             var answerIds;
+            var upVoteTotal;
 
             if (posts.length) {
                 post = posts[0];
-                answerIds = [];
+
+                upVoteTotal = 0;
+
+                post.Vote_On_Posts.forEach(function(voteOnPostObject){
+                    if (voteOnPostObject.voteValue === '1') {
+                        upVoteTotal++;
+                    } else {
+                        upVoteTotal--;
+                    }
+                });
+                post.dataValues.upVoteTotal = upVoteTotal;
+
+                post.Answers.forEach(function(answerObject){
+                    upVoteTotal = 0;
+
+                    answerObject.Vote_On_Answers.forEach(function(voteOnAnswerObject){
+                        if (voteOnAnswerObject.voteValue === '1') {
+                            upVoteTotal++;
+                        } else {
+                            upVoteTotal--;
+                        }
+                    });
+                    answerObject.dataValues.upVoteTotal = upVoteTotal;
+                });
+
 
                 dict.post = post;
                 dict.message ='Post found!';
                 res.statusCode = 200;
 
-                Comment.findAll({
-                    where: {
-                        commentOn: 'post',
-                        commentOnId: post.id
-                    },
-                    include: [{
-                        model: User,
-                        as: 'User',
-                        attributes: ['username', 'id', 'name', 'type']
-                    }]
-                }).then(function(commentsForQuestion){
-                    dict.post.dataValues.Comments = commentsForQuestion;
-
-                    if (dict.post.dataValues.Answers.length) {
-                        dict.post.dataValues.Answers.forEach(function(answerObject){
-                            answerIds.push(answerObject.id);
-                        });
-                        //Data process and then return post with comments, and answers with comments
-
-                        Comment.findAll({
-                            where: {
-                                commentOn: 'answer',
-                                commentOnId: {
-                                    $or: answerIds
-                                }
-                            },
-                            include: [{
-                                model: User,
-                                as: 'User',
-                                attributes: ['username', 'id', 'name', 'type']
-                            }]
-                        }).then(function(commentsForAnswers){
-                            var commentOnIdToAnswerDict = {};
-                            
-                            commentsForAnswers.forEach(function(commentObject){
-                                if (commentOnIdToAnswerDict[commentObject.dataValues.commentOnId]) {
-                                    commentOnIdToAnswerDict[commentObject.dataValues.commentOnId].push(commentObject);
-                                } else {
-                                    commentOnIdToAnswerDict[commentObject.dataValues.commentOnId] = [];
-                                    commentOnIdToAnswerDict[commentObject.dataValues.commentOnId].push(commentObject);
-                                }
-                            });
-
-                            dict.post.dataValues.Answers.forEach(function(answerObject){
-                                answerObject.dataValues.Comments = commentOnIdToAnswerDict[answerObject.id];
-                            });
-
-                            res.json(dict);
-                        });
-                    } else {
-                        res.json(dict);
-                    }
-                });
+                res.json(dict);
             } else {
                 dict.message ='Cannot find this post!';
                 dict.posts_found = posts.length;
@@ -312,6 +281,8 @@ module.exports = function (router) {
         }).catch(function(error) {
             var dict = {};
             res.statusCode = 500;
+
+            console.log(error.message);
 
             dict.message = 'Get posts failed';
             dict.error = error;
@@ -348,13 +319,12 @@ module.exports = function (router) {
             }
 
             dict.id = post.id;
-            pointDict.pointOn = 'post';
-            pointDict.pointOnId = post.id;
+            pointDict.PostId = post.id;
             pointDict.pointValue = 10;
             pointDict.UserId = valid.UserId;
             pointDict.fromUserId = valid.UserId;
 
-            Point.create(pointDict).then(function(point){
+            Point_On_Post.create(pointDict).then(function(point){
                 dict.message = 'Post created and point created for user!';
                 res.json(dict);
             }).catch(function(error){

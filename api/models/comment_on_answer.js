@@ -1,18 +1,10 @@
 module.exports = function(sequelize, DataTypes) {
     'use strict';
 
-    var Comment = sequelize.define('Comment',
+    var Comment_On_Answer = sequelize.define('Comment_On_Answer',
         {
             description: {
                 type: DataTypes.TEXT,
-                allowNull: false
-            },
-            commentOn: {
-                type: DataTypes.ENUM('post', 'answer'),
-                allowNull: false
-            },
-            commentOnId: {
-                type: DataTypes.INTEGER,
                 allowNull: false
             },
             createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
@@ -20,10 +12,11 @@ module.exports = function(sequelize, DataTypes) {
         {
             classMethods: {
                 associate: function(models) {
-                    Comment.belongsTo(models.User);
+                    Comment_On_Answer.belongsTo(models.User);
+                    Comment_On_Answer.belongsTo(models.Answer);
                 }
             }
         });
 
-    return Comment;
+    return Comment_On_Answer;
 };

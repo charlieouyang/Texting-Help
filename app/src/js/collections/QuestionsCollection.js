@@ -16,7 +16,7 @@ define([
     },
     
     parse : function(data) {
-      return data.postRows;
+      return data.posts;
     }
   });
 

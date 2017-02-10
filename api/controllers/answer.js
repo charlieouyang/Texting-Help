@@ -4,7 +4,8 @@ module.exports = function (router) {
     var db = require('../models'),
         auth = require('../middleware/authentication'),
         Answer = db.Answer,
-        Point = db.Point,
+        Point_On_Answer = db.Point_On_Answer,
+        Point_On_Post = db.Point_On_Post,
         Notification = db.Notification,
         availableFields = {
             'description': 'description'
@@ -101,8 +102,9 @@ module.exports = function (router) {
             }
         }
 
-        valid.UserId = req.userId;
-        valid.PostId = data.post_id;
+        valid.UserId = req.userId;          //User id of the answer
+        valid.PostId = data.post_id;        //id of the post
+        //post_or_answer_owner_user           id of the user that created the post
 
         Answer.create(valid).then(function(answer) {
             var dict = {};
@@ -114,20 +116,19 @@ module.exports = function (router) {
                 }
             }
 
-            pointDictForOriginalPost.pointOn = 'post';
-            pointDictForOriginalPost.pointOnId = data.post_id;
+            pointDictForOriginalPost.PostId = data.post_id;
             pointDictForOriginalPost.pointValue = 10;
             pointDictForOriginalPost.UserId = valid.post_or_answer_owner_user;
             pointDictForOriginalPost.fromUserId = valid.UserId;
 
-            Point.create(pointDictForOriginalPost).then(function(originalPostPoint){
-                pointDictForAnswer.pointOn = 'answer';
-                pointDictForAnswer.pointOnId = answer.id;
+            Point_On_Post.create(pointDictForOriginalPost).then(function(originalPostPoint){
+
+                pointDictForAnswer.AnswerId = answer.id;
                 pointDictForAnswer.pointValue = 10;
                 pointDictForAnswer.UserId = valid.UserId;
                 pointDictForAnswer.fromUserId = valid.UserId;
 
-                Point.create(pointDictForAnswer).then(function(answerPoint){
+                Point_On_Answer.create(pointDictForAnswer).then(function(answerPoint){
                     var notificationDict = {};
 
                     //Because valid.UserId might be int and post_or_... might be string
@@ -159,9 +160,10 @@ module.exports = function (router) {
                 res.json(dict);
             });
         }).catch(function(error) {
-            res.statusCode = 422;
-            var dict = {message: 'Validation Failed'};
+            var dict = {};
+            res.statusCode = 500;
 
+            dict.message = 'Create answer failed';
             dict.error = error;
             res.json(dict);
         });
