@@ -62,6 +62,16 @@ define([
         }
       });
 
+      if ($(".date-range-dropdown") && 
+        $(".date-range-dropdown").find("select")) {
+        queryStringObject['daterange'] = $(".date-range-dropdown").find("select").val();
+      }
+
+      if ($(".voted-commented-dropdown") && 
+        $(".voted-commented-dropdown").find("select")) {
+        queryStringObject['votedcommented'] = $(".voted-commented-dropdown").find("select").val();
+      }
+
       if ($(".search-questions-term")[0].value !== "") {
         queryStringObject['search'] = $(".search-questions-term")[0].value;
       }
@@ -92,6 +102,14 @@ define([
 
       if (this.questionsQuery.search) {
         overallQuestionsDataFetchParams.search = this.questionsQuery.search;
+      }
+
+      if (this.questionsQuery.daterange) {
+        overallQuestionsDataFetchParams.daterange = this.questionsQuery.daterange;
+      }
+
+      if (this.questionsQuery.votedcommented) {
+        overallQuestionsDataFetchParams.votedcommented = this.questionsQuery.votedcommented;
       }
 
       overallQuestionsData.fetch({
@@ -125,6 +143,24 @@ define([
               });
 
               $(".search-questions").on('click', function(e) {
+                self.questionsFilteringAndSortingClicked(e);
+              });
+
+              if (result.daterange) {
+                $(".date-range-dropdown").find("select").val(result.daterange);
+              } else {
+                $(".date-range-dropdown").find("select").val('today');
+              }
+              $(".date-range-dropdown").on('change', function(e){
+                self.questionsFilteringAndSortingClicked(e);
+              });
+
+              if (result.votedcommented) {
+                $(".voted-commented-dropdown").find("select").val(result.votedcommented);
+              } else {
+                $(".voted-commented-dropdown").find("select").val('most_recent');
+              }
+              $(".voted-commented-dropdown").on('change', function(e){
                 self.questionsFilteringAndSortingClicked(e);
               });
             },

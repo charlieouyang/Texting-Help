@@ -4,6 +4,26 @@
 
 .date-range-filter {
   top: 8px;
+  width: 200px;
+
+  .filter-name {
+    margin-top: 5px;
+  }
+
+  .filter-dropdown {
+    width: 100px;
+    float: right;
+  }
+}
+
+.voted-commented-filter {
+  top: 8px;
+  margin-left: 6px;
+}
+
+.filters-container {
+  float: right;
+  padding: 15px;
 }
 
 .vote {

@@ -4,7 +4,9 @@ starting the server
 sudo /usr/local/mysql/support-files/mysql.server start
 
 accessing the server
-mysql --user=root --password=oz,q2ACw4,T-
+mysql --user=root --password=root
+
+2017-02-28T03:40:50.721777Z 1 [Note] A temporary password is generated for root@localhost: JQFJ2NlE_a:+
 
 //Should be now root
 

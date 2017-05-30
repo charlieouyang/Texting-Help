@@ -4,6 +4,7 @@ module.exports = function (router) {
     var db = require('../models'),
         auth = require('../middleware/authentication'),
         fs = require('fs'),
+        Sequelize = require('sequelize'),
         Post = db.Post,
         Answer = db.Answer,
         Comment_On_Answer = db.Comment_On_Answer,
@@ -54,6 +55,9 @@ module.exports = function (router) {
         var onlyPostMeta = false;
         var resultsPerPage = 10;
         var pageNumber = queryParams.page;
+        var searchTermsOrBlocks;
+        var dateRangeBlocks;
+        var commentedVotedBlocks;
 
         //If we don't pass in page number, only return number of posts
         if (!pageNumber) {
@@ -103,26 +107,99 @@ module.exports = function (router) {
         if (queryParams.asked_by) {
             if (!postFindingOptions.where) {
                 postFindingOptions.where = {};
+                postFindingOptions.where['$and'] = [];
             }
-            postFindingOptions.where.UserId = queryParams.asked_by;
+            postFindingOptions.where['$and'].push({UserId: queryParams.asked_by});
         }
 
         if (queryParams.search) {
             if (!postFindingOptions.where) {
                 postFindingOptions.where = {};
+                postFindingOptions.where['$and'] = [];
             }
-            postFindingOptions.where['$or'] = [];
-            postFindingOptions.where['$or'].push({ 
+
+            searchTermsOrBlocks = {};
+            searchTermsOrBlocks['$or'] = [];
+
+            searchTermsOrBlocks['$or'].push({ 
                 title: {
                     $like: '%' + queryParams.search + '%'
                 }
             });
-            postFindingOptions.where['$or'].push({
+            searchTermsOrBlocks['$or'].push({
                 description: {
                     $like: '%' + queryParams.search + '%'
                 }
             });
+
+            postFindingOptions.where['$and'].push(searchTermsOrBlocks);
         }
+
+        if (queryParams.daterange) {
+            if (!postFindingOptions.where) {
+                postFindingOptions.where = {};
+                postFindingOptions.where['$and'] = [];
+            }
+
+            if (queryParams.daterange === 'today') {
+                dateRangeBlocks = {
+                    updatedAt: {
+                        $lt: new Date(),
+                        $gt: new Date(new Date() - 24 * 60 * 60 * 1000)
+                    }
+                };
+            } else if (queryParams.daterange === 'this_week') {
+                dateRangeBlocks = {
+                    updatedAt: {
+                        $lt: new Date(),
+                        $gt: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+                    }
+                };
+            } else if (queryParams.daterange === 'this_month') {
+                dateRangeBlocks = {
+                    updatedAt: {
+                        $lt: new Date(),
+                        $gt: new Date(new Date() - 30 * 24 * 60 * 60 * 1000)
+                    }
+                };
+            } else {
+                //If no selections or 'all_time'
+                dateRangeBlocks = {
+                    updatedAt: {
+                        $lt: new Date()
+                    }
+                };
+            }
+            postFindingOptions.where['$and'].push(dateRangeBlocks);
+        }
+
+        // if (queryParams.votedcommented) {
+        //     postFindingOptions.order = [];
+
+        //     if (queryParams.votedcommented === 'most_commented') {
+        //         commentedVotedBlocks = {
+        //             updatedAt: {
+        //                 $lt: new Date(),
+        //                 $gt: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+        //             }
+        //         };
+        //     } else if (queryParams.votedcommented === 'most_recent') {
+        //         commentedVotedBlocks = {
+        //             updatedAt: {
+        //                 $lt: new Date(),
+        //                 $gt: new Date(new Date() - 30 * 24 * 60 * 60 * 1000)
+        //             }
+        //         };
+        //     } else {
+        //         //If no selections or 'most_voted'
+        //         commentedVotedBlocks = {
+        //             updatedAt: {
+        //                 $lt: new Date()
+        //             }
+        //         };
+        //     }
+        //     postFindingOptions.where['$and'].push(commentedVotedBlocks);
+        // }
 
         Post.findAndCountAll(postFindingOptions).then(function(posts) {
             var postRows;

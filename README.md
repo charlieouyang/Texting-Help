@@ -131,17 +131,21 @@ O      - Edit user
 O      - Upvote question
 O      - Downvote question
 
+DONE 21) Add filter for time
+O  - Today
+O  - This week
+O  - This month
 
-
-21) Add filter for time
-  - Today
-  - This week
-  - This month
-
-22) Add filter to rank
+DEFERRED 22) Add filter to rank
   - Top voted
   - Top commented
+
+
 
 23) Search with space
 
 24) Update footer
+
+25) Ask a question.. Success should take you to the question and not ask another question
+
+26) Post your answer and post your comment... add some padding between textarea and button
